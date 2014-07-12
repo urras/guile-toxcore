@@ -22,6 +22,7 @@
 ;;; Code:
 
 (define-module (tox util)
+  #:use-module (rnrs bytevectors)
   #:export (boolean->number
             one?
             define-enumeration
