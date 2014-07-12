@@ -147,6 +147,8 @@ otherwise."
          (bytevector->pointer public-key))))
 
 (define (tox-address tox)
+  "Return bytevector containing the friend address for the messenger
+TOX."
   (let ((bv (make-bytevector tox-friend-address-size)))
     (%tox-get-address (unwrap-tox tox) (bytevector->pointer bv))
     bv))
