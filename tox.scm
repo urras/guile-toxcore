@@ -188,14 +188,15 @@ TOX."
 
 (define (tox-add-friend tox address message)
   "Add a friend identified by the bytevector ADDRESS to the messenger TOX.
-Additionally, send a friend request with the data in the bytevector MESSAGE.
-ADDRESS must be tox-friend-address-size bytes long.  Return a friend number on
+Additionally, send a friend request containing the string MESSAGE.  ADDRESS
+must be tox-friend-address-size bytes long.  Return a friend number on
 success, otherwise return a negative number that corresponds to an error code
 enumerated in tox-friend-add-error."
-  (%tox-add-friend (unwrap-tox tox)
-                   (bytevector->pointer address)
-                   (bytevector->pointer message)
-                   (bytevector-length message)))
+  (let ((m (string->utf8 message)))
+    (%tox-add-friend (unwrap-tox tox)
+                    (bytevector->pointer address)
+                    (bytevector->pointer m)
+                    (bytevector-length m))))
 
 (define (tox-add-friend-no-request tox client-id)
   "Add a friend identified by the bytevector CLIENT-ID to the messenger TOX
