@@ -68,3 +68,6 @@
 
 (define-tox tox-get-friend-number
   int32 "tox_get_friend_number" '(* *))
+
+(define-tox tox-get-client-id
+  int "tox_get_client_id" (list '* int32 '*))

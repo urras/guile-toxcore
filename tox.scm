@@ -38,8 +38,8 @@
             tox-size tox-save tox-load! tox-load
             tox-bootstrap-from-address
             tox-address
-            tox-add-friend
-            tox-add-friend-no-request))
+            tox-add-friend tox-add-friend-no-request
+            tox-friend-client-id))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -206,3 +206,12 @@ messenger TOX, or #f if no such friend exists."
   (false-if-negative
    (%tox-get-friend-number (unwrap-tox tox)
                            (bytevector->pointer client-id))))
+
+(define (tox-friend-client-id tox friend-number)
+  "Return a bytevector containing the public key associated with FRIEND-NUMBER
+in the messenger TOX, or #f if no such friend exists."
+  (let* ((bv (make-bytevector tox-client-id-size))
+         (result (%tox-get-client-id (unwrap-tox tox)
+                                     friend-number
+                                     (bytevector->pointer bv))))
+    (if (negative? result) #f bv)))
