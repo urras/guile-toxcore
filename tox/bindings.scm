@@ -59,3 +59,6 @@
 
 (define-tox tox-get-address
   void "tox_get_address" '(* *))
+
+(define-tox tox-add-friend
+  int32 "tox_add_friend" (list '* '* '* uint16))

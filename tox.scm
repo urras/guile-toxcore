@@ -36,8 +36,9 @@
             tox? tox-connected?
             tox-do-interval tox-do
             tox-size tox-save tox-load! tox-load
-            client-id tox-bootstrap-from-address
-            tox-address))
+            tox-bootstrap-from-address
+            tox-address
+            tox-add-friend))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -170,3 +171,14 @@ TOX."
   (let ((bv (make-bytevector tox-friend-address-size)))
     (%tox-get-address (unwrap-tox tox) (bytevector->pointer bv))
     bv))
+
+(define (tox-add-friend tox address message)
+  "Add a friend identified by the bytevector ADDRESS to the messenger TOX.
+Additionally, send a friend request with the data in the bytevector MESSAGE.
+ADDRESS must be tox-friend-address-size bytes long.  Return a friend number on
+success, otherwise return a negative number that corresponds to an error code
+enumerated in tox-friend-add-error."
+  (%tox-add-friend (unwrap-tox tox)
+                   (bytevector->pointer address)
+                   (bytevector->pointer message)
+                   (bytevector-length message)))
