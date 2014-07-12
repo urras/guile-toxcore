@@ -32,7 +32,7 @@
             tox-user-status
             tox-client-id-size tox-friend-address-size
             tox-client-id tox-friend-address
-            make-tox tox-kill
+            make-tox tox-kill with-tox
             tox? tox-connected?
             tox-do-interval tox-do
             tox-size tox-save tox-load! tox-load
@@ -98,6 +98,18 @@ create a IPv4 or IPv6 socket.  By default, an IPv6 socket is created."
 (define/unwrap tox-kill
   "Free all memory associated with the messenger TOX."
   %tox-kill)
+
+(define-syntax-rule (with-tox tox body ...)
+  "Evaluate BODY ... and ensure that memory for the messenger TOX is properly
+freed when with-tox returns, be it normally or because of an exception."
+  (dynamic-wind
+    (lambda () #t)
+    (lambda ()
+      (let ((results (call-with-values (lambda ()  body ...) list)))
+        (tox-kill tox)
+        (apply values results)))
+    (lambda ()
+      (tox-kill tox))))
 
 (define/unwrap tox-do-interval
   "Return the time in milliseconds before tox-do should be called
