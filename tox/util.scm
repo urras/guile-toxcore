@@ -54,9 +54,8 @@
                                #'enum)))))))
 
 (define (hex-string->bytevector str)
-  "Return a newly allocated bytevector of LENGTH bytes containing the binary
-representation of the hexadecimal encoded string STR.  The length of STR must
-be even."
+  "Return a newly allocated bytevector containing the binary representation of
+the hexadecimal encoded string STR.  The length of STR must be even."
   (define (read-byte start)
     (string->number
      (string-append "#x" (substring str start (+ start 2)))))
