@@ -22,7 +22,7 @@
 ;;; Code:
 
 (define-module (tox util)
-  #:export (boolean->number one?))
+  #:export (boolean->number one? define-enumeration))
 
 (define (boolean->number true?)
   "Return 1 if TRUE? is #t, 0 otherwise."
@@ -31,3 +31,18 @@
 (define (one? n)
   "Return #t if N is equal to 1, #f otherwise."
   (= n 1))
+
+;; Borrowed from guile-opengl
+(define-syntax-rule (define-enumeration enumerator (name value) ...)
+  (define-syntax enumerator
+    (lambda (x)
+      (syntax-case x ()
+        ((_)
+         #''(name ...))
+        ((_ enum) (number? (syntax->datum #'enum))
+         #'enum)
+        ((_ enum)
+         (or (assq-ref '((name . value) ...)
+                       (syntax->datum #'enum))
+             (syntax-violation 'enumerator "invalid enumerated value"
+                               #'enum)))))))

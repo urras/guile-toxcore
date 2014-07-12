@@ -28,7 +28,9 @@
   #:use-module (system foreign)
   #:use-module ((tox bindings) #:prefix %)
   #:use-module (tox util)
-  #:export (tox-client-id-size
+  #:export (tox-friend-add-error
+            tox-user-status
+            tox-client-id-size
             tox-friend-address-size
             make-tox tox-kill
             tox? tox-connected?
@@ -36,6 +38,22 @@
             tox-size tox-save tox-load! tox-load
             client-id tox-bootstrap-from-address
             tox-address))
+
+(define-enumeration tox-friend-add-error
+  (too-long -1)
+  (no-message -2)
+  (own-key -3)
+  (already-sent -4)
+  (unknown -5)
+  (bad-checksum -6)
+  (set-new-no-spam -7)
+  (no-mem -8))
+
+(define-enumeration tox-user-status
+  (none 0)
+  (away 1)
+  (busy 2)
+  (invalid 3))
 
 (define tox-client-id-size 32)
 
