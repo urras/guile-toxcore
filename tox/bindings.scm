@@ -98,3 +98,12 @@
 
 (define-tox tox-get-self-name
   uint16 "tox_get_self_name" (list '* '*))
+
+(define-tox tox-get-name
+  int "tox_get_name" (list '* int32 '*))
+
+(define-tox tox-get-name-size
+  int "tox_get_name_size" (list '* int32))
+
+(define-tox tox-get-self-name-size
+  int "tox_get_self_name_size" '(*))
