@@ -92,3 +92,9 @@
 
 (define-tox tox-send-action-withid
   uint32 "tox_send_action_withid" (list '* int32 uint32 '* uint32))
+
+(define-tox tox-set-name
+  int "tox_set_name" (list '* '* uint16))
+
+(define-tox tox-get-self-name
+  uint16 "tox_get_self_name" (list '* '*))

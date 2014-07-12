@@ -27,6 +27,7 @@
             one?
             define-enumeration
             hex-string->bytevector bytevector->hex-string
+            bytevector-slice
             false-if-negative false-if-zero
             htons))
 
@@ -76,6 +77,16 @@ of the contents of the bytevector BV."
     (map (lambda (n)
            (format #f "~x" n))
          (bytevector->u8-list bv)))))
+
+(define (bytevector-slice bv begin end)
+  "Return a newly allocated bytevector containing the contents of BV from the
+index BEGIN, inclusive, to the index END, exclusive."
+  (let ((ret (make-bytevector (- end begin))))
+    (let loop ((i begin))
+      (when (< i end)
+        (u8vector-set! ret (- i begin) (u8vector-ref bv i))
+        (loop (1+ i))))
+    ret))
 
 (define (false-if-negative n)
   "Return #f is N is negative, or N otherwise."

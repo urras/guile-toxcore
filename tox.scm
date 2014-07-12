@@ -43,7 +43,8 @@
             tox-add-friend tox-add-friend-no-request tox-delete-friend
             tox-friend-number tox-friend-client-id
             tox-friend-connected? tox-friend-exists?
-            tox-send-message tox-send-action))
+            tox-send-message tox-send-action
+            set-tox-name tox-name))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -266,3 +267,21 @@ Return the message id on success, #f otherwise."
             friend-number
             action
             id))
+
+(define (set-tox-name tox name)
+  "Use the nickname NAME for the messenger TOX."
+  (let ((name (string->utf8 name)))
+    (if (zero? (%tox-set-name (unwrap-tox tox)
+                              (bytevector->pointer name)
+                              (bytevector-length name)))
+        *unspecified*
+        (error "Invalid nickname: " name))))
+
+(define (tox-name tox)
+  "Return the nickname for the messenger TOX."
+  (let* ((name (make-bytevector tox-max-name-length))
+         (length (%tox-get-self-name (unwrap-tox tox)
+                                     (bytevector->pointer name))))
+    (if (positive? length)
+        (utf8->string (bytevector-slice name 0 length))
+        (error "Failed to get nickname"))))
