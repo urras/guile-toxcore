@@ -74,3 +74,6 @@
 
 (define-tox tox-del-friend
   int "tox_del_friend" (list '* int32))
+
+(define-tox tox-get-friend-connection-status
+  int "tox_get_friend_connection_status" (list '* int32))

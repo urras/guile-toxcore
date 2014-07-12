@@ -39,7 +39,8 @@
             tox-bootstrap-from-address
             tox-address
             tox-add-friend tox-add-friend-no-request tox-delete-friend
-            tox-friend-number tox-friend-client-id))
+            tox-friend-number tox-friend-client-id
+            tox-friend-connected?))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -220,3 +221,7 @@ in the messenger TOX, or #f if no such friend exists."
                                      friend-number
                                      (bytevector->pointer bv))))
     (if (negative? result) #f bv)))
+
+(define (tox-friend-connected? tox friend-number)
+  "Return #t if friend identified by FRIEND-NUMBER is online, #f otherwise."
+  (zero? (%tox-get-friend-connection-status (unwrap-tox tox) friend-number)))
