@@ -113,3 +113,9 @@
 
 (define-tox tox-set-user-status
   int "tox_set_user_status" (list '* uint8))
+
+(define-tox tox-get-status-message-size
+  int "tox_get_status_message_size" (list '* int32))
+
+(define-tox tox-get-self-status-message-size
+  int "tox_get_self_status_message_size" '(*))
