@@ -22,7 +22,10 @@
 ;;; Code:
 
 (define-module (tox util)
-  #:export (boolean->number one? define-enumeration))
+  #:export (boolean->number
+            one?
+            define-enumeration
+            hex-string->bytevector))
 
 (define (boolean->number true?)
   "Return 1 if TRUE? is #t, 0 otherwise."
@@ -46,3 +49,19 @@
                        (syntax->datum #'enum))
              (syntax-violation 'enumerator "invalid enumerated value"
                                #'enum)))))))
+
+(define (hex-string->bytevector str)
+  "Return a newly allocated bytevector of LENGTH bytes containing the binary
+representation of the hexadecimal encoded string STR.  The length of STR must
+be even."
+  (define (read-byte start)
+    (string->number
+     (string-append "#x" (substring str start (+ start 2)))))
+
+  (let* ((size (/ (string-length str) 2))
+         (bv (make-bytevector size)))
+    (let loop ((i 0))
+      (when (< i size)
+        (bytevector-u8-set! bv i (read-byte (* i 2)))
+        (loop (1+ i))))
+    bv))

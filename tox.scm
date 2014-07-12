@@ -30,8 +30,8 @@
   #:use-module (tox util)
   #:export (tox-friend-add-error
             tox-user-status
-            tox-client-id-size
-            tox-friend-address-size
+            tox-client-id-size tox-friend-address-size
+            tox-client-id tox-friend-address
             make-tox tox-kill
             tox? tox-connected?
             tox-do-interval tox-do
@@ -60,6 +60,20 @@
 
 (define tox-friend-address-size
   (+ tox-client-id-size (sizeof uint32) (sizeof uint16)))
+
+(define (tox-client-id id)
+  "Return a newly allocated bytevector of length tox-client-id-size by
+transcoding the hexadecimal string ID."
+  (if (= (string-length id) (* tox-client-id-size 2))
+      (hex-string->bytevector id)
+      (error "Invalid Tox client ID: " id)))
+
+(define (tox-friend-address address)
+  "Return a newly allocated bytevector of length tox-friend-address-size by
+transcoding the hexadecimal string ADDRESS."
+  (if (= (string-length address) (* tox-friend-address-size 2))
+      (hex-string->bytevector address)
+      (error "Invalid Tox friend address: " address)))
 
 (define-wrapped-pointer-type <tox>
   tox? wrap-tox unwrap-tox
@@ -126,24 +140,6 @@ STATE."
   "Return #t if the messenger TOX is connected to the DHT, #f
 otherwise."
   (one? (%tox-isconnected (unwrap-tox tox))))
-
-(define (tox-client-id id)
-  "Return a newly allocated 32 byte long bytevector by transcoding the
-hexadecimal string ID."
-  (define (read-byte start)
-    (string->number
-     (string-append "#x" (substring id start (+ start 2)))))
-
-  (unless (= (string-length id) (* tox-client-id-size 2))
-    (error "Invalid Tox client ID: " id))
-
-  (let* ((size (/ (string-length id) 2))
-         (bv (make-bytevector size)))
-    (let loop ((i 0))
-      (when (< i size)
-        (bytevector-u8-set! bv i (read-byte (* i 2)))
-        (loop (1+ i))))
-    bv))
 
 (define (tox-bootstrap-from-address tox address ipv6-enabled? port public-key)
   "Resolve ADDRESS into an IP address.  If successful, send a 'get
