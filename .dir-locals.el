@@ -4,7 +4,8 @@
                      (tab-width   .  8)))
  (scheme-mode
   .
-  ((indent-tabs-mode . nil)))
+  ((indent-tabs-mode . nil)
+   (eval . (put 'with-tox 'scheme-indent-function 1))))
  (emacs-lisp-mode . ((indent-tabs-mode . nil)))
  (texinfo-mode    . ((indent-tabs-mode . nil)
                      (fill-column . 72))))
