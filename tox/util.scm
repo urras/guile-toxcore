@@ -25,4 +25,5 @@
   #:export (boolean->number))
 
 (define (boolean->number true?)
+  "Return 1 if TRUE? is #t, 0 otherwise."
   (if true? 1 0))
