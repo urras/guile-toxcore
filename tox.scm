@@ -45,7 +45,8 @@
             tox-friend-connected? tox-friend-exists?
             tox-send-message tox-send-action
             set-tox-name tox-name tox-friend-name
-            set-tox-status))
+            set-tox-status
+            tox-status-message tox-friend-status-message))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -311,3 +312,26 @@ status to the string MESSAGE."
                                         (bytevector->pointer m)
                                         (bytevector-length m)))
           (error "Invalid status message: " message))))))
+
+(define (tox-status-message tox)
+  "Return the status message for the messenger TOX."
+  (let* ((message (make-bytevector tox-max-status-message-length))
+         (length (%tox-get-self-status-message (unwrap-tox tox)
+                                               (bytevector->pointer message)
+                                               tox-max-status-message-length)))
+    (if (positive? length)
+        (utf8->string (bytevector-slice message 0 length))
+        (error "Failed to get status message"))))
+
+(define (tox-friend-status-message tox friend-number)
+  "Return the status message for the friend identified by FRIEND-NUMBER i the
+messenger TOX."
+  (let* ((message (make-bytevector tox-max-status-message-length))
+         (length (%tox-get-status-message (unwrap-tox tox)
+                                          friend-number
+                                          (bytevector->pointer message)
+                                          tox-max-status-message-length)))
+    (if (positive? length)
+        (utf8->string (bytevector-slice message 0 length))
+        (error "Failed to get status message for friend number: "
+               friend-number))))

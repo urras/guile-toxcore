@@ -119,3 +119,9 @@
 
 (define-tox tox-get-self-status-message-size
   int "tox_get_self_status_message_size" '(*))
+
+(define-tox tox-get-status-message
+  int "tox_get_status_message" (list '* int32 '* uint32))
+
+(define-tox tox-get-self-status-message
+  int "tox_get_self_status_message" (list '* '* uint32))
