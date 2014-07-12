@@ -27,7 +27,7 @@
             one?
             define-enumeration
             hex-string->bytevector bytevector->hex-string
-            false-if-negative
+            false-if-negative false-if-zero
             htons))
 
 (define (boolean->number true?)
@@ -80,6 +80,10 @@ of the contents of the bytevector BV."
 (define (false-if-negative n)
   "Return #f is N is negative, or N otherwise."
   (if (negative? n) #f n))
+
+(define (false-if-zero n)
+  "Return #f is N is zero, or N otherwise."
+  (if (zero? n) #f n))
 
 ;; The htons available in Guile has been deprecated as of version 2.0.11.
 (define (htons n)

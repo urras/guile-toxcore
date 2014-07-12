@@ -80,3 +80,9 @@
 
 (define-tox tox-friend-exists
   int "tox_friend_exists" (list '* int32))
+
+(define-tox tox-send-message
+  uint32 "tox_send_message" (list '* int32 '* uint32))
+
+(define-tox tox-send-message-withid
+  uint32 "tox_send_message_withid" (list '* int32 uint32 '* uint32))

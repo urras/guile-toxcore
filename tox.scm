@@ -42,7 +42,8 @@
             tox-address
             tox-add-friend tox-add-friend-no-request tox-delete-friend
             tox-friend-number tox-friend-client-id
-            tox-friend-connected? tox-friend-exists?))
+            tox-friend-connected? tox-friend-exists?
+            tox-send-message))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -227,3 +228,19 @@ in the messenger TOX, or #f if no such friend exists."
 (define (tox-friend-exists? tox friend-number)
   "Return #t if friend identified by FRIEND-NUMBER exists, #f otherwise."
   (one? (%tox-friend-exists (unwrap-tox tox) friend-number)))
+
+(define* (tox-send-message tox friend-number message #:optional (id #f))
+  "Send the string MESSAGE to the friend identified by FRIEND-NUMBER in the
+messenger TOX.  Optionally, a message ID may be given.  If omitted, an id is
+automatically generated.  MESSAGE length may not exceed
+tox-max-message-length.
+
+Return the message id on success, #f otherwise."
+  (let* ((tox (unwrap-tox tox))
+         (message (string->utf8 message))
+         (ptr (bytevector->pointer message))
+         (length (bytevector-length message)))
+    (false-if-zero
+     (if id
+         (%tox-send-message-withid tox friend-number id ptr length)
+         (%tox-send-message tox friend-number ptr length)))))
