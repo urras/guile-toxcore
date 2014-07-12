@@ -26,7 +26,7 @@
   #:use-module (system foreign)
   #:use-module ((tox bindings) #:prefix %)
   #:use-module (tox util)
-  #:export (tox-new tox-kill))
+  #:export (make-tox tox-kill))
 
 (define-wrapped-pointer-type <tox>
   tox? wrap-tox unwrap-tox
@@ -34,7 +34,7 @@
     (format port "#<<tox> ~x>"
             (pointer-address (unwrap-tox tox)))))
 
-(define* (tox-new #:optional (ipv6-enabled? #t))
+(define* (make-tox #:optional (ipv6-enabled? #t))
   "Return a newly allocated Tox messenger.  IPV6-ENABLED? indicates whether to
 create a IPv4 or IPv6 socket.  By default, an IPv6 socket is created."
   (let ((ptr (%tox-new (boolean->number ipv6-enabled?))))
