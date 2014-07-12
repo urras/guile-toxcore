@@ -108,7 +108,7 @@ STATE."
 otherwise."
   (one? (%tox-isconnected (unwrap-tox tox))))
 
-(define (client-id id)
+(define (tox-client-id id)
   "Return a newly allocated 32 byte long bytevector by transcoding the
 hexadecimal string ID."
   (define (read-byte start)
