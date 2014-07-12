@@ -43,7 +43,7 @@
             tox-add-friend tox-add-friend-no-request tox-delete-friend
             tox-friend-number tox-friend-client-id
             tox-friend-connected? tox-friend-exists?
-            tox-send-message))
+            tox-send-message tox-send-action))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -229,6 +229,16 @@ in the messenger TOX, or #f if no such friend exists."
   "Return #t if friend identified by FRIEND-NUMBER exists, #f otherwise."
   (one? (%tox-friend-exists (unwrap-tox tox) friend-number)))
 
+(define (tox-send tox send send-with-id friend-number message id)
+  (let* ((tox (unwrap-tox tox))
+         (message (string->utf8 message))
+         (ptr (bytevector->pointer message))
+         (length (bytevector-length message)))
+    (false-if-zero
+     (if id
+         (send-with-id tox friend-number id ptr length)
+         (send tox friend-number ptr length)))))
+
 (define* (tox-send-message tox friend-number message #:optional (id #f))
   "Send the string MESSAGE to the friend identified by FRIEND-NUMBER in the
 messenger TOX.  Optionally, a message ID may be given.  If omitted, an id is
@@ -236,11 +246,23 @@ automatically generated.  MESSAGE length may not exceed
 tox-max-message-length.
 
 Return the message id on success, #f otherwise."
-  (let* ((tox (unwrap-tox tox))
-         (message (string->utf8 message))
-         (ptr (bytevector->pointer message))
-         (length (bytevector-length message)))
-    (false-if-zero
-     (if id
-         (%tox-send-message-withid tox friend-number id ptr length)
-         (%tox-send-message tox friend-number ptr length)))))
+  (tox-send tox
+            %tox-send-message
+            %tox-send-message-withid
+            friend-number
+            message
+            id))
+
+(define* (tox-send-action tox friend-number action #:optional (id #f))
+  "Send the string ACTION to the friend identified by FRIEND-NUMBER in the
+messenger TOX.  Optionally, a message ID may be given.  If omitted, an id is
+automatically generated.  MESSAGE length may not exceed
+tox-max-message-length.
+
+Return the message id on success, #f otherwise."
+  (tox-send tox
+            %tox-send-action
+            %tox-send-action-withid
+            friend-number
+            action
+            id))

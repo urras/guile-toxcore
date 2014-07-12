@@ -86,3 +86,9 @@
 
 (define-tox tox-send-message-withid
   uint32 "tox_send_message_withid" (list '* int32 uint32 '* uint32))
+
+(define-tox tox-send-action
+  uint32 "tox_send_action" (list '* int32 '* uint32))
+
+(define-tox tox-send-action-withid
+  uint32 "tox_send_action_withid" (list '* int32 uint32 '* uint32))
