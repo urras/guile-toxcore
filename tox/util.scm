@@ -26,7 +26,7 @@
   #:export (boolean->number
             one?
             define-enumeration
-            hex-string->bytevector
+            hex-string->bytevector bytevector->hex-string
             false-if-negative
             htons))
 
@@ -67,6 +67,15 @@ the hexadecimal encoded string STR.  The length of STR must be even."
         (bytevector-u8-set! bv i (read-byte (* i 2)))
         (loop (1+ i))))
     bv))
+
+(define (bytevector->hex-string bv)
+  "Return a newly allocated string containing the hexadecimal representation
+of the contents of the bytevector BV."
+  (string-upcase
+   (string-concatenate
+    (map (lambda (n)
+           (format #f "~x" n))
+         (bytevector->u8-list bv)))))
 
 (define (false-if-negative n)
   "Return #f is N is negative, or N otherwise."
