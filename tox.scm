@@ -39,7 +39,7 @@
             tox-bootstrap-from-address
             tox-address
             tox-add-friend tox-add-friend-no-request
-            tox-friend-client-id))
+            tox-friend-number tox-friend-client-id))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
