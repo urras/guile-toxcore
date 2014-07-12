@@ -138,7 +138,7 @@ TOX."
     (%tox-save (unwrap-tox tox) (bytevector->pointer bv))
     bv))
 
-(define (tox-load! tox state)
+(define (tox-load tox state)
   "Load the saved data in the bytevector STATE into the messenger
 TOX."
   (or (zero?
@@ -146,13 +146,6 @@ TOX."
                   (bytevector->pointer state)
                   (bytevector-length state)))
       (error "Failed to load Tox state: " tox)))
-
-(define (tox-load state)
-  "Return a newly allocated Tox messenger loaded from the bytevector
-STATE."
-  (let ((tox (make-tox)))
-    (tox-load! tox state)
-    tox))
 
 (define (tox-connected? tox)
   "Return #t if the messenger TOX is connected to the DHT, #f
