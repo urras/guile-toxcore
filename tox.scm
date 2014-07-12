@@ -30,6 +30,8 @@
   #:use-module (tox util)
   #:export (tox-friend-add-error
             tox-user-status
+            tox-max-name-length tox-max-message-length
+            tox-max-status-message-length
             tox-client-id-size tox-friend-address-size
             tox-client-id tox-friend-address
             make-tox tox-kill with-tox
@@ -58,8 +60,10 @@
   (busy 2)
   (invalid 3))
 
+(define tox-max-name-length 128)
+(define tox-max-message-length 1368)
+(define tox-max-status-message-length 1007)
 (define tox-client-id-size 32)
-
 (define tox-friend-address-size
   (+ tox-client-id-size (sizeof uint32) (sizeof uint16)))
 
