@@ -28,12 +28,19 @@
   #:use-module (system foreign)
   #:use-module ((tox bindings) #:prefix %)
   #:use-module (tox util)
-  #:export (make-tox
-            tox-kill
+  #:export (tox-client-id-size
+            tox-friend-address-size
+            make-tox tox-kill
             tox? tox-connected?
             tox-do-interval tox-do
             tox-size tox-save tox-load! tox-load
-            client-id tox-bootstrap-from-address))
+            client-id tox-bootstrap-from-address
+            tox-address))
+
+(define tox-client-id-size 32)
+
+(define tox-friend-address-size
+  (+ tox-client-id-size (sizeof uint32) (sizeof uint16)))
 
 (define-wrapped-pointer-type <tox>
   tox? wrap-tox unwrap-tox
@@ -108,7 +115,7 @@ hexadecimal string ID."
     (string->number
      (string-append "#x" (substring id start (+ start 2)))))
 
-  (unless (= (string-length id) 64)
+  (unless (= (string-length id) (* tox-client-id-size 2))
     (error "Invalid Tox client ID: " id))
 
   (let* ((size (/ (string-length id) 2))
@@ -138,3 +145,8 @@ otherwise."
          (boolean->number ipv6-enabled?)
          (htons port)
          (bytevector->pointer public-key))))
+
+(define (tox-address tox)
+  (let ((bv (make-bytevector tox-friend-address-size)))
+    (%tox-get-address (unwrap-tox tox) (bytevector->pointer bv))
+    bv))
