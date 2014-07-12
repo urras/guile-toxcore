@@ -32,7 +32,8 @@
             tox-kill
             tox? tox-connected?
             tox-do-interval tox-do
-            tox-size tox-save tox-load! tox-load))
+            tox-size tox-save tox-load! tox-load
+            client-id tox-bootstrap-from-address))
 
 (define-wrapped-pointer-type <tox>
   tox? wrap-tox unwrap-tox
@@ -99,3 +100,41 @@ STATE."
   "Return #t if the messenger TOX is connected to the DHT, #f
 otherwise."
   (one? (%tox-isconnected (unwrap-tox tox))))
+
+(define (client-id id)
+  "Return a newly allocated 32 byte long bytevector by transcoding the
+hexadecimal string ID."
+  (define (read-byte start)
+    (string->number
+     (string-append "#x" (substring id start (+ start 2)))))
+
+  (unless (= (string-length id) 64)
+    (error "Invalid Tox client ID: " id))
+
+  (let* ((size (/ (string-length id) 2))
+         (bv (make-bytevector size)))
+    (let loop ((i 0))
+      (when (< i size)
+        (bytevector-u8-set! bv i (read-byte (* i 2)))
+        (loop (1+ i))))
+    bv))
+
+(define (tox-bootstrap-from-address tox address ipv6-enabled? port public-key)
+  "Resolve ADDRESS into an IP address.  If successful, send a 'get
+nodes' request to the given node with IP, PORT, and PUBLIC-KEY to
+setup connections.
+
+ADDRESS can be a hostname or an IP address (IPv4 or IPv6).  If
+IPV6-ENABLED? is #f, the resolving sticks strictly to IPv4 addresses.
+If IPV6-ENABLED? is #t, the resolving procedure looks for IPv6
+addresses first, then IPv4 addresses.  PUBLIC-KEY is a 32 byte long
+bytevector.
+
+Return #t if ADDRESS could be converted into an IP address, #f
+otherwise."
+  (one? (%tox-bootstrap-from-address
+         (unwrap-tox tox)
+         (string->pointer address)
+         (boolean->number ipv6-enabled?)
+         (htons port)
+         (bytevector->pointer public-key))))
