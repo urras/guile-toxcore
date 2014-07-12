@@ -27,7 +27,8 @@
             one?
             define-enumeration
             hex-string->bytevector
-            false-if-negative))
+            false-if-negative
+            htons))
 
 (define (boolean->number true?)
   "Return 1 if TRUE? is #t, 0 otherwise."
@@ -71,3 +72,9 @@ be even."
 (define (false-if-negative n)
   "Return #f is N is negative, or N otherwise."
   (if (negative? n) #f n))
+
+;; The htons available in Guile has been deprecated as of version 2.0.11.
+(define (htons n)
+  "Converts the unsigned short integer N from host byte order to network byte
+order.  N is assumed to be a positive integer in the range [0, 65535]."
+  (logand (logior (ash n 8) (ash n -8)) #xffff))
