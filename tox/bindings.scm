@@ -41,3 +41,12 @@
 
 (define-tox tox-do
   void "tox_do" '(*))
+
+(define-tox tox-size
+  uint32 "tox_size" '(*))
+
+(define-tox tox-save
+  void "tox_save" '(* *))
+
+(define-tox tox-load
+  int "tox_load" (list '* '* uint32))

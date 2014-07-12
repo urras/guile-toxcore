@@ -23,12 +23,15 @@
 
 (define-module (tox)
   #:use-module (ice-9 format)
+  #:use-module (rnrs bytevectors)
+  #:use-module (srfi srfi-4)
   #:use-module (system foreign)
   #:use-module ((tox bindings) #:prefix %)
   #:use-module (tox util)
   #:export (make-tox
             tox-kill
-            tox-do-interval tox-do))
+            tox-do-interval tox-do
+            tox-size tox-save tox-load!))
 
 (define-wrapped-pointer-type <tox>
   tox? wrap-tox unwrap-tox
@@ -62,3 +65,24 @@ again for optimal performance."
   "The main loop that needs to be run in intervals of tox-do-interval
 milliseconds."
   %tox-do)
+
+(define/unwrap tox-size
+  "Return the size of the Tox messenger data in bytes.  Useful for
+saving state."
+  %tox-size)
+
+(define (tox-save tox)
+  "Return a uint8 bytevector containing the state of the messenger
+TOX."
+  (let ((bv (make-u8vector (tox-size tox))))
+    (%tox-save (unwrap-tox tox) (bytevector->pointer bv))
+    bv))
+
+(define (tox-load! tox state)
+  "Load the saved data in the bytevector STATE into the messenger
+TOX."
+  (or (zero?
+       (%tox-load (unwrap-tox tox)
+                  (bytevector->pointer state)
+                  (bytevector-length state)))
+      (error "Failed to load Tox state: " tox)))
