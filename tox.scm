@@ -31,7 +31,7 @@
   #:export (make-tox
             tox-kill
             tox-do-interval tox-do
-            tox-size tox-save tox-load!))
+            tox-size tox-save tox-load! tox-load))
 
 (define-wrapped-pointer-type <tox>
   tox? wrap-tox unwrap-tox
@@ -86,3 +86,10 @@ TOX."
                   (bytevector->pointer state)
                   (bytevector-length state)))
       (error "Failed to load Tox state: " tox)))
+
+(define (tox-load state)
+  "Return a newly allocated Tox messenger loaded from the bytevector
+STATE."
+  (let ((tox (make-tox)))
+    (tox-load! tox state)
+    tox))
