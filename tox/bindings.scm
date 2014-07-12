@@ -107,3 +107,9 @@
 
 (define-tox tox-get-self-name-size
   int "tox_get_self_name_size" '(*))
+
+(define-tox tox-set-status-message
+  int "tox_set_status_message" (list '* '* uint16))
+
+(define-tox tox-set-user-status
+  int "tox_set_user_status" (list '* uint8))

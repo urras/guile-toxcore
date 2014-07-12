@@ -44,7 +44,8 @@
             tox-friend-number tox-friend-client-id
             tox-friend-connected? tox-friend-exists?
             tox-send-message tox-send-action
-            set-tox-name tox-name tox-friend-name))
+            set-tox-name tox-name tox-friend-name
+            set-tox-status))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -296,3 +297,17 @@ messenger TOX."
     (if (positive? length)
         (utf8->string (bytevector-slice name 0 length))
         (error "Failed to get nickname for friend number: " friend-number))))
+
+(define* (set-tox-status tox status #:optional (message #f))
+  "Set the user status for the messenger TOX to STATUS.  Optionally, set the
+status to the string MESSAGE."
+  (let ((tox (unwrap-tox tox)))
+    (when (negative? (%tox-set-user-status tox status))
+      (error "Invalid user status: " status))
+    (when (string? message)
+      (let ((m (string->utf8 message)))
+        (when (negative?
+               (%tox-set-status-message tox
+                                        (bytevector->pointer m)
+                                        (bytevector-length m)))
+          (error "Invalid status message: " message))))))
