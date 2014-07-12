@@ -6,12 +6,29 @@ Guile Scheme bindings for [libtoxcore](https://github.com/irungentoo/toxcore).
 Usage
 -----
 
+There are 2 ways to use guile-toxcore.  The `(tox)` module exports a
+high-level API that performs error checking and abstracts away the handling of
+foreign data types and pointers.  This is almost certainly the API that you
+want to use.  However, if you desire to build up your own abstractions on top
+of the low-level C bindings or the high level bindings do not do what you
+want, use the `(tox bindings)` module.
+
+To use the high-level API:
+
 ```
 (use-modules (tox))
 
-(define tox (make-tox))
+(with-tox (make-tox)
+  ;; TODO: Call your friend to ask if they've read their SICP today.
+  (display "Hello, Tox!\n"))
+```
 
-;; TODO: Call your friend to ask if they've read their SICP today.
+To use the low-level API:
+
+```
+(use-modules (tox bindings))
+
+(define tox (tox-new 1))
 
 (tox-kill tox)
 ```
