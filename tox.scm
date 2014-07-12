@@ -26,13 +26,20 @@
   #:use-module (system foreign)
   #:use-module ((tox bindings) #:prefix %)
   #:use-module (tox util)
-  #:export (make-tox tox-kill))
+  #:export (make-tox
+            tox-kill
+            tox-do-interval tox-do))
 
 (define-wrapped-pointer-type <tox>
   tox? wrap-tox unwrap-tox
   (lambda (tox port)
     (format port "#<<tox> ~x>"
             (pointer-address (unwrap-tox tox)))))
+
+(define-syntax-rule (define/unwrap name docstring proc)
+  (define (name tox)
+    docstring
+    (proc (unwrap-tox tox))))
 
 (define* (make-tox #:optional (ipv6-enabled? #t))
   "Return a newly allocated Tox messenger.  IPV6-ENABLED? indicates whether to
@@ -42,6 +49,16 @@ create a IPv4 or IPv6 socket.  By default, an IPv6 socket is created."
         (error "Failed to create tox instance")
         (wrap-tox ptr))))
 
-(define (tox-kill tox)
+(define/unwrap tox-kill
   "Free all memory associated with the messenger TOX."
-  (%tox-kill (unwrap-tox tox)))
+  %tox-kill)
+
+(define/unwrap tox-do-interval
+  "Return the time in milliseconds before tox-do should be called
+again for optimal performance."
+  %tox-do-interval)
+
+(define/unwrap tox-do
+  "The main loop that needs to be run in intervals of tox-do-interval
+milliseconds."
+  %tox-do)

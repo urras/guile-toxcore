@@ -35,3 +35,9 @@
 
 (define-tox tox-kill
   void "tox_kill" '(*))
+
+(define-tox tox-do-interval
+  uint32 "tox_do_interval" '(*))
+
+(define-tox tox-do
+  void "tox_do" '(*))
