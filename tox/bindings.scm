@@ -65,3 +65,6 @@
 
 (define-tox tox-add-friend-norequest
   int32 "tox_add_friend_norequest" '(* *))
+
+(define-tox tox-get-friend-number
+  int32 "tox_get_friend_number" '(* *))

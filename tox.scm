@@ -196,6 +196,13 @@ enumerated in tox-friend-add-error."
   "Add a friend identified by the bytevector CLIENT-ID to the messenger TOX
 without sending a friend request.  Return the friend ID if successful, or #f
 otherwise."
-  (let ((friend-id (%tox-add-friend-norequest
-                    (unwrap-tox tox) (bytevector->pointer client-id))))
-    (if (negative? friend-id) #f friend-id)))
+  (false-if-negative
+   (%tox-add-friend-norequest (unwrap-tox tox)
+                              (bytevector->pointer client-id))))
+
+(define (tox-friend-number tox client-id)
+  "Return the friend number associated with the bytevector CLIENT-ID in the
+messenger TOX, or #f if no such friend exists."
+  (false-if-negative
+   (%tox-get-friend-number (unwrap-tox tox)
+                           (bytevector->pointer client-id))))

@@ -25,7 +25,8 @@
   #:export (boolean->number
             one?
             define-enumeration
-            hex-string->bytevector))
+            hex-string->bytevector
+            false-if-negative))
 
 (define (boolean->number true?)
   "Return 1 if TRUE? is #t, 0 otherwise."
@@ -65,3 +66,7 @@ be even."
         (bytevector-u8-set! bv i (read-byte (* i 2)))
         (loop (1+ i))))
     bv))
+
+(define (false-if-negative n)
+  "Return #f is N is negative, or N otherwise."
+  (if (negative? n) #f n))
