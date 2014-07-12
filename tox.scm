@@ -38,7 +38,8 @@
             tox-size tox-save tox-load! tox-load
             tox-bootstrap-from-address
             tox-address
-            tox-add-friend))
+            tox-add-friend
+            tox-add-friend-no-request))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -178,3 +179,11 @@ enumerated in tox-friend-add-error."
                    (bytevector->pointer address)
                    (bytevector->pointer message)
                    (bytevector-length message)))
+
+(define (tox-add-friend-no-request tox client-id)
+  "Add a friend identified by the bytevector CLIENT-ID to the messenger TOX
+without sending a friend request.  Return the friend ID if successful, or #f
+otherwise."
+  (let ((friend-id (%tox-add-friend-norequest
+                    (unwrap-tox tox) (bytevector->pointer client-id))))
+    (if (negative? friend-id) #f friend-id)))
