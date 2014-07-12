@@ -58,7 +58,7 @@
 create a IPv4 or IPv6 socket.  By default, an IPv6 socket is created."
   (let ((ptr (%tox-new (boolean->number ipv6-enabled?))))
     (if (null-pointer? ptr)
-        (error "Failed to create tox instance")
+        (error "Failed to create Tox messenger")
         (wrap-tox ptr))))
 
 (define/unwrap tox-kill
