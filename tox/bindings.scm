@@ -50,3 +50,6 @@
 
 (define-tox tox-load
   int "tox_load" (list '* '* uint32))
+
+(define-tox tox-isconnected
+  int "tox_isconnected" '(*))

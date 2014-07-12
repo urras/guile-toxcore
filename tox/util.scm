@@ -22,8 +22,12 @@
 ;;; Code:
 
 (define-module (tox util)
-  #:export (boolean->number))
+  #:export (boolean->number one?))
 
 (define (boolean->number true?)
   "Return 1 if TRUE? is #t, 0 otherwise."
   (if true? 1 0))
+
+(define (one? n)
+  "Return #t if N is equal to 1, #f otherwise."
+  (= n 1))

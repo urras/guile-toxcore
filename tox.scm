@@ -30,6 +30,7 @@
   #:use-module (tox util)
   #:export (make-tox
             tox-kill
+            tox? tox-connected?
             tox-do-interval tox-do
             tox-size tox-save tox-load! tox-load))
 
@@ -93,3 +94,8 @@ STATE."
   (let ((tox (make-tox)))
     (tox-load! tox state)
     tox))
+
+(define (tox-connected? tox)
+  "Return #t if the messenger TOX is connected to the DHT, #f
+otherwise."
+  (one? (%tox-isconnected (unwrap-tox tox))))
