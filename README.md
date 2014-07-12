@@ -9,7 +9,7 @@ Usage
 ```
 (use-modules (tox))
 
-(define tox (tox-new))
+(define tox (make-tox))
 
 ;; TODO: Call your friend to ask if they've read their SICP today.
 
