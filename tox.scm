@@ -40,7 +40,7 @@
             tox-address
             tox-add-friend tox-add-friend-no-request tox-delete-friend
             tox-friend-number tox-friend-client-id
-            tox-friend-connected?))
+            tox-friend-connected? tox-friend-exists?))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -225,3 +225,7 @@ in the messenger TOX, or #f if no such friend exists."
 (define (tox-friend-connected? tox friend-number)
   "Return #t if friend identified by FRIEND-NUMBER is online, #f otherwise."
   (zero? (%tox-get-friend-connection-status (unwrap-tox tox) friend-number)))
+
+(define (tox-friend-exists? tox friend-number)
+  "Return #t if friend identified by FRIEND-NUMBER exists, #f otherwise."
+  (one? (%tox-friend-exists (unwrap-tox tox) friend-number)))
