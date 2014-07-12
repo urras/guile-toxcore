@@ -38,7 +38,7 @@
             tox-size tox-save tox-load! tox-load
             tox-bootstrap-from-address
             tox-address
-            tox-add-friend tox-add-friend-no-request
+            tox-add-friend tox-add-friend-no-request tox-delete-friend
             tox-friend-number tox-friend-client-id))
 
 (define-enumeration tox-friend-add-error
@@ -199,6 +199,11 @@ otherwise."
   (false-if-negative
    (%tox-add-friend-norequest (unwrap-tox tox)
                               (bytevector->pointer client-id))))
+
+(define (tox-delete-friend tox friend-number)
+  "Remove the friend identified by FRIEND-NUMBER from the messenger TOX.
+Return #t if successful, #f otherwise."
+  (zero? (%tox-del-friend (unwrap-tox tox) friend-number)))
 
 (define (tox-friend-number tox client-id)
   "Return the friend number associated with the bytevector CLIENT-ID in the

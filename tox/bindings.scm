@@ -71,3 +71,6 @@
 
 (define-tox tox-get-client-id
   int "tox_get_client_id" (list '* int32 '*))
+
+(define-tox tox-del-friend
+  int "tox_del_friend" (list '* int32))
