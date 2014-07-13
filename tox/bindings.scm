@@ -152,3 +152,6 @@
 
 (define-tox tox-get-friendlist
   uint32 "tox_get_friendlist" (list '* '* uint32))
+
+(define-tox tox-callback-friend-message
+  void "tox_callback_friend_message" '(* * *))

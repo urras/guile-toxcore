@@ -25,6 +25,7 @@
   #:use-module (ice-9 format)
   #:use-module (rnrs bytevectors)
   #:use-module (srfi srfi-4)
+  #:use-module (srfi srfi-9)
   #:use-module (system foreign)
   #:use-module ((tox bindings) #:prefix %)
   #:use-module (tox util)
@@ -35,6 +36,9 @@
             tox-client-id-size tox-friend-address-size
             tox-client-id tox-friend-address
             make-tox tox-kill with-tox
+            tox-friend-request-hook tox-message-hook tox-action-hook
+            tox-name-change-hook tox-status-message-hook tox-status-hook
+            tox-typing-hook tox-read-receipt-hook tox-connection-status-hook
             tox? tox-connected?
             tox-do-interval tox-do
             tox-size tox-save tox-load! tox-load
@@ -91,11 +95,49 @@ transcoding the hexadecimal string ADDRESS."
       (hex-string->bytevector address)
       (error "Invalid Tox friend address: " address)))
 
-(define-wrapped-pointer-type <tox>
-  tox? wrap-tox unwrap-tox
-  (lambda (tox port)
-    (format port "#<<tox> ~x>"
-            (pointer-address (unwrap-tox tox)))))
+(define-record-type <tox>
+  (%make-tox pointer friend-request-hook message-hook action-hook
+             name-change-hook status-message-hook status-hook
+             typing-hook read-receipt-hook connection-status-hook)
+  tox?
+  (pointer tox-pointer)
+  (friend-request-hook tox-friend-request-hook)
+  (message-hook tox-message-hook)
+  (action-hook tox-action-hook)
+  (name-change-hook tox-name-change-hook)
+  (status-message-hook tox-status-message-hook)
+  (status-hook tox-status-hook)
+  (typing-hook tox-typing-hook)
+  (read-receipt-hook tox-read-receipt-hook)
+  (connection-status-hook tox-connection-status-hook))
+
+(define (wrap-tox pointer)
+  (let  ((tox (%make-tox pointer
+                         (make-hook)
+                         (make-hook 3)
+                         (make-hook)
+                         (make-hook)
+                         (make-hook)
+                         (make-hook)
+                         (make-hook)
+                         (make-hook)
+                         (make-hook))))
+    ;; Register callbacks to run hooks.
+    (%tox-callback-friend-message
+     pointer
+     (procedure->pointer
+      void
+      (lambda (ptr friend-number message length user-data)
+        (run-hook (tox-message-hook tox)
+                  tox
+                  friend-number
+                  (utf8->string (pointer->bytevector message length))))
+      (list '* int32 '* uint16 '*))
+     %null-pointer)
+    tox))
+
+(define (unwrap-tox tox)
+  (tox-pointer tox))
 
 (define-syntax-rule (define/unwrap name docstring proc)
   (define (name tox)
