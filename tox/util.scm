@@ -24,10 +24,12 @@
 (define-module (tox util)
   #:use-module (ice-9 format)
   #:use-module (rnrs bytevectors)
+  #:use-module (system foreign)
   #:export (boolean->number
             one?
             define-enumeration
             hex-string->bytevector bytevector->hex-string
+            utf8-pointer->string
             bytevector-slice
             false-if-negative false-if-zero
             htons))
@@ -78,6 +80,11 @@ of the contents of the bytevector BV."
     (map (lambda (n)
            (format #f "~x" n))
          (bytevector->u8-list bv)))))
+
+(define (utf8-pointer->string pointer length)
+  "Return a newly allocated string containing the characters within the UTF-8
+encoded foreign POINTER of LENGTH bytes."
+  (utf8->string (pointer->bytevector pointer length)))
 
 (define (bytevector-slice bv begin end)
   "Return a newly allocated bytevector containing the contents of BV from the

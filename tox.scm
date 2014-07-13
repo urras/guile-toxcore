@@ -131,7 +131,7 @@ transcoding the hexadecimal string ADDRESS."
         (run-hook (tox-message-hook tox)
                   tox
                   friend-number
-                  (utf8->string (pointer->bytevector message length))))
+                  (utf8-pointer->string message length)))
       (list '* int32 '* uint16 '*))
      %null-pointer)
     tox))
