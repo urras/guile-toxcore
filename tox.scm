@@ -45,7 +45,7 @@
             tox-friend-connected? tox-friend-exists?
             tox-send-message tox-send-action
             set-tox-name tox-name tox-friend-name
-            set-tox-status
+            set-tox-status set-tox-status-message
             tox-status-message tox-friend-status-message
             tox-status tox-friend-status
             tox-friend-last-online
@@ -305,19 +305,19 @@ messenger TOX."
         (utf8->string (bytevector-slice name 0 length))
         (error "Failed to get nickname for friend number: " friend-number))))
 
-(define* (set-tox-status tox status #:optional (message #f))
-  "Set the user status for the messenger TOX to STATUS.  Optionally, set the
-status to the string MESSAGE."
-  (let ((tox (unwrap-tox tox)))
-    (when (negative? (%tox-set-user-status tox status))
-      (error "Invalid user status: " status))
-    (when (string? message)
-      (let ((m (string->utf8 message)))
-        (when (negative?
-               (%tox-set-status-message tox
-                                        (bytevector->pointer m)
-                                        (bytevector-length m)))
-          (error "Invalid status message: " message))))))
+(define (set-tox-status tox status)
+  "Set the user status for the messenger TOX to STATUS."
+  (when (negative? (%tox-set-user-status (unwrap-tox tox) status))
+    (error "Invalid user status: " status)))
+
+(define (set-tox-status-message tox message)
+  "Set the status message for the messenger TOX to the string MESSAGE."
+  (let ((m (string->utf8 message)))
+    (when (negative?
+           (%tox-set-status-message (unwrap-tox tox)
+                                    (bytevector->pointer m)
+                                    (bytevector-length m)))
+      (error "Invalid status message: " message))))
 
 (define (tox-status-message tox)
   "Return the status message for the messenger TOX."
