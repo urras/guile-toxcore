@@ -113,7 +113,7 @@ transcoding the hexadecimal string ADDRESS."
 
 (define (wrap-tox pointer)
   (let  ((tox (%make-tox pointer
-                         (make-hook)
+                         (make-hook 3)
                          (make-hook 3)
                          (make-hook)
                          (make-hook)
@@ -123,6 +123,18 @@ transcoding the hexadecimal string ADDRESS."
                          (make-hook)
                          (make-hook))))
     ;; Register callbacks to run hooks.
+    (%tox-callback-friend-request
+     pointer
+     (procedure->pointer
+      void
+      (lambda (ptr public-key message length user-data)
+        (run-hook (tox-friend-request-hook tox)
+                  tox
+                  (pointer->bytevector public-key tox-client-id-size)
+                  (utf8-pointer->string message length)))
+      (list '* '* '* uint16 '*))
+     %null-pointer)
+
     (%tox-callback-friend-message
      pointer
      (procedure->pointer
@@ -134,6 +146,7 @@ transcoding the hexadecimal string ADDRESS."
                   (utf8-pointer->string message length)))
       (list '* int32 '* uint16 '*))
      %null-pointer)
+
     tox))
 
 (define (unwrap-tox tox)
@@ -245,8 +258,8 @@ enumerated in tox-friend-add-error."
 
 (define (tox-add-friend-no-request tox client-id)
   "Add a friend identified by the bytevector CLIENT-ID to the messenger TOX
-without sending a friend request.  Return the friend ID if successful, or #f
-otherwise."
+without sending a friend request.  Return the friend number if successful, or
+#f otherwise."
   (false-if-negative
    (%tox-add-friend-norequest (unwrap-tox tox)
                               (bytevector->pointer client-id))))
