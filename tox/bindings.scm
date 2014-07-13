@@ -149,3 +149,6 @@
 
 (define-tox tox-get-num-online-friends
   uint32 "tox_get_num_online_friends" '(*))
+
+(define-tox tox-get-friendlist
+  uint32 "tox_get_friendlist" (list '* '* uint32))

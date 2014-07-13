@@ -51,7 +51,8 @@
             tox-friend-last-online
             set-tox-friend-typing tox-friend-typing?
             set-tox-send-receipts
-            tox-friend-count tox-online-friend-count))
+            tox-friend-count tox-online-friend-count
+            tox-friend-list))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -385,3 +386,12 @@ the messenger TOX.  SEND-RECEIPTS? should be either #t of #f."
   "Return the number of online friends in the friend list for the messenger
 TOX."
   %tox-get-num-online-friends)
+
+(define (tox-friend-list tox)
+  "Return a list of all friend numbers for the messenger TOX."
+  (let* ((length (tox-friend-count tox))
+         (bv (make-s32vector length)))
+    (%tox-get-friendlist (unwrap-tox tox)
+                         (bytevector->pointer bv)
+                         length)
+    (bytevector->sint-list bv (native-endianness) (sizeof int32))))
