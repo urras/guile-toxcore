@@ -47,7 +47,8 @@
             set-tox-name tox-name tox-friend-name
             set-tox-status
             tox-status-message tox-friend-status-message
-            tox-status tox-friend-status))
+            tox-status tox-friend-status
+            tox-friend-last-online))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -345,3 +346,11 @@ messenger TOX."
   "Return the user status code for the friend identified by FRIEND-NUMBER in
 the messenger TOX."
   (%tox-get-user-status (unwrap-tox tox) friend-number))
+
+(define (tox-friend-last-online tox friend-number)
+  "Return the timestamp of the last time the friend identified by
+FRIEND-NUMBER was seen online, or 0 if never seen."
+  (let ((result (%tox-get-last-online (unwrap-tox tox) friend-number)))
+    (if (negative? result)
+        (error "Invalid friend number: " friend-number)
+        result)))

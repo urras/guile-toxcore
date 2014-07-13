@@ -131,3 +131,6 @@
 
 (define-tox tox-get-self-user-status
   uint8 "tox_get_self_user_status" '(*))
+
+(define-tox tox-get-last-online
+  uint64 "tox_get_last_online" (list '* int32))
