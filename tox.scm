@@ -49,7 +49,8 @@
             tox-status-message tox-friend-status-message
             tox-status tox-friend-status
             tox-friend-last-online
-            set-tox-friend-typing tox-friend-typing?))
+            set-tox-friend-typing tox-friend-typing?
+            set-tox-send-receipts))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -367,3 +368,10 @@ messenger TOX."
   "Return #t if the friend identified by FRIEND-NUMBER in the messenger TOX is
 typing, or #f otherwise."
   (one? (%tox-get-is-typing (unwrap-tox tox) friend-number)))
+
+(define (set-tox-send-receipts tox friend-number send-receipts?)
+  "Set whether to send receipts to the friend identified by FRIEND-NUMBER in
+the messenger TOX.  SEND-RECEIPTS? should be either #t of #f."
+  (%tox-set-sends-receipts (unwrap-tox tox)
+                           friend-number
+                           (boolean->number send-receipts?)))

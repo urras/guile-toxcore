@@ -140,3 +140,6 @@
 
 (define-tox tox-get-is-typing
   uint8 "tox_get_is_typing" (list '* int32))
+
+(define-tox tox-set-sends-receipts
+  void "tox_set_sends_receipts" (list '* int32 int))
