@@ -146,3 +146,6 @@
 
 (define-tox tox-count-friendlist
   uint32 "tox_count_friendlist" '(*))
+
+(define-tox tox-get-num-online-friends
+  uint32 "tox_get_num_online_friends" '(*))

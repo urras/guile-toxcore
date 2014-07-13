@@ -51,7 +51,7 @@
             tox-friend-last-online
             set-tox-friend-typing tox-friend-typing?
             set-tox-send-receipts
-            tox-friend-count))
+            tox-friend-count tox-online-friend-count))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -380,3 +380,8 @@ the messenger TOX.  SEND-RECEIPTS? should be either #t of #f."
 (define/unwrap tox-friend-count
   "Return the number of friends in the friend list for the messenger TOX."
   %tox-count-friendlist)
+
+(define/unwrap tox-online-friend-count
+  "Return the number of online friends in the friend list for the messenger
+TOX."
+  %tox-get-num-online-friends)
