@@ -134,3 +134,9 @@
 
 (define-tox tox-get-last-online
   uint64 "tox_get_last_online" (list '* int32))
+
+(define-tox tox-set-user-is-typing
+  int "tox_set_user_is_typing" (list '* int32 uint8))
+
+(define-tox tox-get-is-typing
+  uint8 "tox_get_is_typing" (list '* int32))

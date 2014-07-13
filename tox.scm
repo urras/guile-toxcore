@@ -48,7 +48,8 @@
             set-tox-status
             tox-status-message tox-friend-status-message
             tox-status tox-friend-status
-            tox-friend-last-online))
+            tox-friend-last-online
+            set-tox-friend-typing tox-friend-typing?))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -354,3 +355,15 @@ FRIEND-NUMBER was seen online, or 0 if never seen."
     (if (negative? result)
         (error "Invalid friend number: " friend-number)
         result)))
+
+(define (set-tox-friend-typing tox friend-number typing?)
+  "Set the typing flag for the friend identified by FRIEND-NUMBER in the
+messenger TOX."
+  (if (zero? (%tox-set-user-is-typing (unwrap-tox tox) friend-number typing?))
+      *unspecified*
+      (error "Invalid friend number: " friend-number)))
+
+(define (tox-friend-typing? tox friend-number)
+  "Return #t if the friend identified by FRIEND-NUMBER in the messenger TOX is
+typing, or #f otherwise."
+  (one? (%tox-get-is-typing (unwrap-tox tox) friend-number)))
