@@ -78,7 +78,7 @@ of the contents of the bytevector BV."
   (string-upcase
    (string-concatenate
     (map (lambda (n)
-           (format #f "~x" n))
+           (format #f "~2,'0x" n))
          (bytevector->u8-list bv)))))
 
 (define (utf8-pointer->string pointer length)
