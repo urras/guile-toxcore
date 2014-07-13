@@ -153,5 +153,29 @@
 (define-tox tox-get-friendlist
   uint32 "tox_get_friendlist" (list '* '* uint32))
 
+(define-tox tox-callback-friend-request
+  void "tox_callback_friend_request" '(* * *))
+
 (define-tox tox-callback-friend-message
   void "tox_callback_friend_message" '(* * *))
+
+(define-tox tox-callback-friend-action
+  void "tox_callback_friend_action" '(* * *))
+
+(define-tox tox-callback-name-change
+  void "tox_callback_name_change" '(* * *))
+
+(define-tox tox-callback-status-message
+  void "tox_callback_status_message" '(* * *))
+
+(define-tox tox-callback-user-status
+  void "tox_callback_user_status" '(* * *))
+
+(define-tox tox-callback-typing-change
+  void "tox_callback_typing_change" '(* * *))
+
+(define-tox tox-callback-read-receipt
+  void "tox_callback_read_receipt" '(* * *))
+
+(define-tox tox-callback-connection-status
+  void "tox_callback_connection_status" '(* * *))
