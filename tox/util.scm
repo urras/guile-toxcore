@@ -22,6 +22,7 @@
 ;;; Code:
 
 (define-module (tox util)
+  #:use-module (ice-9 format)
   #:use-module (rnrs bytevectors)
   #:export (boolean->number
             one?
