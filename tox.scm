@@ -98,7 +98,7 @@ transcoding the hexadecimal string ADDRESS."
 (define-record-type <tox>
   (%make-tox pointer friend-request-hook message-hook action-hook
              name-change-hook status-message-hook status-hook
-             typing-hook read-receipt-hook connection-status-hook)
+             typing-hook read-receipt-hook online-hook)
   tox?
   (pointer tox-pointer)
   (friend-request-hook tox-friend-request-hook)
@@ -109,19 +109,19 @@ transcoding the hexadecimal string ADDRESS."
   (status-hook tox-status-hook)
   (typing-hook tox-typing-hook)
   (read-receipt-hook tox-read-receipt-hook)
-  (connection-status-hook tox-connection-status-hook))
+  (online-hook tox-online-hook))
 
 (define (wrap-tox pointer)
   (let  ((tox (%make-tox pointer
                          (make-hook 3)
                          (make-hook 3)
-                         (make-hook)
-                         (make-hook)
-                         (make-hook)
-                         (make-hook)
-                         (make-hook)
-                         (make-hook)
-                         (make-hook))))
+                         (make-hook 3)
+                         (make-hook 3)
+                         (make-hook 3)
+                         (make-hook 3)
+                         (make-hook 3)
+                         (make-hook 3)
+                         (make-hook 3))))
     ;; Register callbacks to run hooks.
     (%tox-callback-friend-request
      pointer
@@ -145,6 +145,90 @@ transcoding the hexadecimal string ADDRESS."
                   friend-number
                   (utf8-pointer->string message length)))
       (list '* int32 '* uint16 '*))
+     %null-pointer)
+
+    (%tox-callback-friend-action
+     pointer
+     (procedure->pointer
+      void
+      (lambda (ptr friend-number action length user-data)
+        (run-hook (tox-message-hook tox)
+                  tox
+                  friend-number
+                  (utf8-pointer->string action length)))
+      (list '* int32 '* uint16 '*))
+     %null-pointer)
+
+    (%tox-callback-name-change
+     pointer
+     (procedure->pointer
+      void
+      (lambda (ptr friend-number name length user-data)
+        (run-hook (tox-name-change-hook tox)
+                  tox
+                  friend-number
+                  (utf8-pointer->string name length)))
+      (list '* int32 '* uint16 '*))
+     %null-pointer)
+
+    (%tox-callback-status-message
+     pointer
+     (procedure->pointer
+      void
+      (lambda (ptr friend-number message length user-data)
+        (run-hook (tox-status-message-hook tox)
+                  tox
+                  friend-number
+                  (utf8-pointer->string message length)))
+      (list '* int32 '* uint16 '*))
+     %null-pointer)
+
+    (%tox-callback-user-status
+     pointer
+     (procedure->pointer
+      void
+      (lambda (ptr friend-number status user-data)
+        (run-hook (tox-status-hook tox)
+                  tox
+                  friend-number
+                  status))
+      (list '* int32 uint8 '*))
+     %null-pointer)
+
+    (%tox-callback-typing-change
+     pointer
+     (procedure->pointer
+      void
+      (lambda (ptr friend-number typing user-data)
+        (run-hook (tox-typing-hook tox)
+                  tox
+                  friend-number
+                  (one? typing)))
+      (list '* int32 uint8 '*))
+     %null-pointer)
+
+    (%tox-callback-read-receipt
+     pointer
+     (procedure->pointer
+      void
+      (lambda (ptr friend-number receipt user-data)
+        (run-hook (tox-read-receipt-hook tox)
+                  tox
+                  friend-number
+                  receipt))
+      (list '* int32 int32 '*))
+     %null-pointer)
+
+    (%tox-callback-connection-status
+     pointer
+     (procedure->pointer
+      void
+      (lambda (ptr friend-number status user-data)
+        (run-hook (tox-online-hook tox)
+                  tox
+                  friend-number
+                  (one? status)))
+      (list '* int32 uint8 '*))
      %null-pointer)
 
     tox))
