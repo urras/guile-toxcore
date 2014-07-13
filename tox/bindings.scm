@@ -143,3 +143,6 @@
 
 (define-tox tox-set-sends-receipts
   void "tox_set_sends_receipts" (list '* int32 int))
+
+(define-tox tox-count-friendlist
+  uint32 "tox_count_friendlist" '(*))
