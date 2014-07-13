@@ -46,7 +46,8 @@
             tox-send-message tox-send-action
             set-tox-name tox-name tox-friend-name
             set-tox-status
-            tox-status-message tox-friend-status-message))
+            tox-status-message tox-friend-status-message
+            tox-status tox-friend-status))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -335,3 +336,12 @@ messenger TOX."
         (utf8->string (bytevector-slice message 0 length))
         (error "Failed to get status message for friend number: "
                friend-number))))
+
+(define/unwrap tox-status
+  "Return the user status code for the messenger TOX."
+  %tox-get-self-user-status)
+
+(define (tox-friend-status tox friend-number)
+  "Return the user status code for the friend identified by FRIEND-NUMBER in
+the messenger TOX."
+  (%tox-get-user-status (unwrap-tox tox) friend-number))

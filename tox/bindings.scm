@@ -125,3 +125,9 @@
 
 (define-tox tox-get-self-status-message
   int "tox_get_self_status_message" (list '* '* uint32))
+
+(define-tox tox-get-user-status
+  uint8 "tox_get_user_status" (list '* int32))
+
+(define-tox tox-get-self-user-status
+  uint8 "tox_get_self_user_status" '(*))
