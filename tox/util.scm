@@ -32,7 +32,8 @@
             utf8-pointer->string
             bytevector-slice
             false-if-negative false-if-zero
-            htons))
+            htons)
+  #:replace (htons))
 
 (define (boolean->number true?)
   "Return 1 if TRUE? is #t, 0 otherwise."
