@@ -38,6 +38,27 @@ To use the low-level API:
 (tox-kill tox)
 ```
 
+Example Client
+--------------
+
+An example client is included in the guile-toxcore distribution.  Unlike
+guile-toxcore, the example client requires Guile version 2.0.11 or greater.
+
+To run the client:
+
+```
+cd examples
+cp guile-tox.sample ~/.guile-tox # Copy sample config
+guile -L .. client.scm
+```
+
+The client does not accept input directly.  In order to give commands, you
+must connect to the REPL server via telnet or use the geiser package in Emacs.
+
+```
+telnet localhost 37146
+```
+
 Dependencies
 ------------
 
