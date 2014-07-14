@@ -18,9 +18,14 @@ To use the high-level API:
 ```
 (use-modules (tox))
 
-(with-tox (make-tox)
-  ;; TODO: Call your friend to ask if they've read their SICP today.
-  (display "Hello, Tox!\n"))
+(define tox (make-tox))
+
+(set-tox-name tox "Tox User")
+(set-tox-status-message tox "Happily hacking")
+;; TODO: Call your friend to ask if they've read their SICP today.
+(while #t
+  (tox-do tox)
+  (usleep (* (tox-do-interval tox) 1000)))
 ```
 
 To use the low-level API:
