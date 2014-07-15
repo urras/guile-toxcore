@@ -55,7 +55,8 @@
             set-tox-friend-typing tox-friend-typing?
             set-tox-send-receipts
             tox-friend-count tox-online-friend-count
-            tox-friend-list))
+            tox-friend-list
+            set-tox-nospam tox-nospam))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -540,3 +541,11 @@ TOX."
                          (bytevector->pointer bv)
                          length)
     (bytevector->sint-list bv (native-endianness) (sizeof int32))))
+
+(define (set-tox-nospam tox nospam)
+  "Set the 'nospam' part of the address for the messenger TOX."
+  (%tox-set-nospam (unwrap-tox tox) nospam))
+
+(define/unwrap tox-nospam
+  "Return the 'nospam' part of the address for the messenger TOX."
+  %tox-get-nospam)

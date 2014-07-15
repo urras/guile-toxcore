@@ -179,3 +179,9 @@
 
 (define-tox tox-callback-connection-status
   void "tox_callback_connection_status" '(* * *))
+
+(define-tox tox-get-nospam
+  uint32 "tox_get_nospam" '(*))
+
+(define-tox tox-set-nospam
+  void "tox_set_nospam" (list '* uint32))
