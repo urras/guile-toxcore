@@ -29,8 +29,9 @@
       (format #t "~a" (tox-save tox)))))
 
 (define (load!)
-  (display "Loading tox_save\n")
-  (tox-load tox (with-input-from-file "tox_save" read)))
+  (when (file-exists? "tox_save")
+    (display "Loading tox_save\n")
+    (tox-load tox (with-input-from-file "tox_save" read))))
 
 (define connected? #f)
 (define last-connection-attempt (current-time))
