@@ -79,7 +79,6 @@
   (peer-delete 1)
   (peer-name 2))
 
-
 (define-enumeration tox-file-control
   (accept 0)
   (pause 1)
