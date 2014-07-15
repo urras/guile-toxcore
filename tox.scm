@@ -74,6 +74,19 @@
   (busy 2)
   (invalid 3))
 
+(define-enumeration tox-chat-event
+  (peer-add 0)
+  (peer-delete 1)
+  (peer-name 2))
+
+
+(define-enumeration tox-file-control
+  (accept 0)
+  (pause 1)
+  (kill 2)
+  (finished 3)
+  (resume-broken 4))
+
 (define tox-max-name-length 128)
 (define tox-max-message-length 1368)
 (define tox-max-status-message-length 1007)
