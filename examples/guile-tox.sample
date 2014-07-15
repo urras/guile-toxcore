@@ -1,3 +1,5 @@
+;; -*- mode: scheme -*-
+
 (use-modules (tox util))
 
 (define tox-bootstrap-nodes
@@ -39,7 +41,7 @@
          (tox-friend-name tox friend-number))
        (tox-friend-list tox)))
 
-(add-hook! (tox-friend-request-hook tox)
+(add-hook! tox-friend-request-hook
            (lambda (tox public-key message)
              (format #t
                      "Auto-accept friend request:\nClient ID: ~a\nMessage: ~a\n\n"
@@ -47,10 +49,42 @@
                      message)
              (tox-add-friend-no-request tox public-key)))
 
-(add-hook! (tox-message-hook tox)
-           (lambda (tox friend-number message)
+(add-hook! tox-message-hook
+           (lambda (tox friend message)
              ;; Easy way to kill the client for testing purposes.
              (when (string=? message "quit")
                (quit!))
-             (let ((name (tox-friend-name tox friend-number)))
+             (let ((name (tox-friend-name tox friend)))
                (format #t "~a: ~a\n" name message))))
+
+(add-hook! tox-action-hook
+           (lambda (tox friend action)
+             (let ((name (tox-friend-name tox friend)))
+               (format #t "* ~a ~a\n" name action))))
+
+(add-hook! tox-name-change-hook
+           (lambda (tox friend new-name)
+             (let ((name (tox-friend-name tox friend)))
+               (unless (string=? name new-name)
+                 (format #t "*** ~a is now known as ~a\n" name new-name)))))
+
+(add-hook! tox-status-message-hook
+          (lambda (tox friend status-message)
+            (let ((name (tox-friend-name tox friend)))
+              (format #t "*** ~a's status: ~a\n" name status-message))))
+
+(add-hook! tox-status-hook
+           (lambda (tox friend status)
+             (let ((status-map '((0 . "available")
+                                 (1 . "away")
+                                 (2 . "busy")
+                                 (3 . "invalid")))
+                   (name (tox-friend-name tox friend)))
+               (format #t "*** ~a is now ~a\n"
+                       name (assq-ref status-map status)))))
+
+(add-hook! tox-online-hook
+           (lambda (tox friend online?)
+             (let ((name (tox-friend-name tox friend))
+                   (status (if online? "online" "offline")))
+               (format #t "*** ~a is ~a\n" name status))))
