@@ -25,7 +25,6 @@
   #:use-module (ice-9 format)
   #:use-module (rnrs bytevectors)
   #:use-module (srfi srfi-4)
-  #:use-module (srfi srfi-9)
   #:use-module (system foreign)
   #:use-module ((tox bindings) #:prefix %)
   #:use-module (tox util)
@@ -38,7 +37,7 @@
             make-tox tox-kill with-tox
             tox-friend-request-hook tox-message-hook tox-action-hook
             tox-name-change-hook tox-status-message-hook tox-status-hook
-            tox-typing-hook tox-read-receipt-hook tox-connection-status-hook
+            tox-typing-hook tox-read-receipt-hook tox-online-hook
             tox? tox-connected?
             tox-do-interval tox-do
             tox-size tox-save tox-load! tox-load
@@ -95,146 +94,153 @@ transcoding the hexadecimal string ADDRESS."
       (hex-string->bytevector address)
       (error "Invalid Tox friend address: " address)))
 
-(define-record-type <tox>
-  (%make-tox pointer friend-request-hook message-hook action-hook
-             name-change-hook status-message-hook status-hook
-             typing-hook read-receipt-hook online-hook)
-  tox?
-  (pointer tox-pointer)
-  (friend-request-hook tox-friend-request-hook)
-  (message-hook tox-message-hook)
-  (action-hook tox-action-hook)
-  (name-change-hook tox-name-change-hook)
-  (status-message-hook tox-status-message-hook)
-  (status-hook tox-status-hook)
-  (typing-hook tox-typing-hook)
-  (read-receipt-hook tox-read-receipt-hook)
-  (online-hook tox-online-hook))
+(define-wrapped-pointer-type <tox>
+  tox? %wrap-tox unwrap-tox
+  (lambda (tox port)
+    (format port "#<<tox> ~x>"
+            (pointer-address (unwrap-tox tox)))))
+
+(define-syntax-rule (define-tox-hook name)
+  (define name (make-hook 3)))
+
+(define-tox-hook tox-friend-request-hook)
+
+(define friend-request-callback
+  (procedure->pointer
+   void
+   (lambda (tox public-key message length user-data)
+     (run-hook tox-friend-request-hook
+               (%wrap-tox tox)
+               (pointer->bytevector public-key tox-client-id-size)
+               (utf8-pointer->string message length)))
+   (list '* '* '* uint16 '*)))
+
+(define-tox-hook tox-message-hook)
+
+(define friend-message-callback
+  (procedure->pointer
+   void
+   (lambda (tox friend-number message length user-data)
+     (run-hook tox-message-hook
+               (%wrap-tox tox)
+               friend-number
+               (utf8-pointer->string message length)))
+   (list '* int32 '* uint16 '*)))
+
+(define-tox-hook tox-action-hook)
+
+(define friend-action-callback
+  (procedure->pointer
+   void
+   (lambda (tox friend-number action length user-data)
+     (run-hook tox-action-hook
+               (%wrap-tox tox)
+               friend-number
+               (utf8-pointer->string action length)))
+   (list '* int32 '* uint16 '*)))
+
+(define-tox-hook tox-name-change-hook)
+
+(define name-change-callback
+  (procedure->pointer
+   void
+   (lambda (tox friend-number name length user-data)
+     (run-hook tox-name-change-hook
+               (%wrap-tox tox)
+               friend-number
+               (utf8-pointer->string name length)))
+   (list '* int32 '* uint16 '*)))
+
+(define-tox-hook tox-status-message-hook)
+
+(define status-message-callback
+  (procedure->pointer
+   void
+   (lambda (tox friend-number message length user-data)
+     (run-hook tox-status-message-hook
+               (%wrap-tox tox)
+               friend-number
+               (utf8-pointer->string message length)))
+   (list '* int32 '* uint16 '*)))
+
+(define-tox-hook tox-status-hook)
+
+(define user-status-callback
+  (procedure->pointer
+   void
+   (lambda (tox friend-number status user-data)
+     (run-hook tox-status-hook
+               (%wrap-tox tox)
+               friend-number
+               status))
+   (list '* int32 uint8 '*)))
+
+(define-tox-hook tox-typing-hook)
+
+(define typing-change-callback
+  (procedure->pointer
+   void
+   (lambda (tox friend-number typing user-data)
+     (run-hook tox-typing-hook
+               (%wrap-tox tox)
+               friend-number
+               (one? typing)))
+   (list '* int32 uint8 '*)))
+
+(define-tox-hook tox-read-receipt-hook)
+
+(define read-receipt-callback
+  (procedure->pointer
+   void
+   (lambda (tox friend-number receipt user-data)
+     (run-hook tox-read-receipt-hook
+               (%wrap-tox tox)
+               friend-number
+               receipt))
+   (list '* int32 int32 '*)))
+
+(define-tox-hook tox-online-hook)
+
+(define connection-status-callback
+ (procedure->pointer
+     void
+     (lambda (tox friend-number status user-data)
+       (run-hook tox-online-hook
+                 (%wrap-tox tox)
+                 friend-number
+                 (one? status)))
+     (list '* int32 uint8 '*)))
 
 (define (wrap-tox pointer)
-  (let  ((tox (%make-tox pointer
-                         (make-hook 3)
-                         (make-hook 3)
-                         (make-hook 3)
-                         (make-hook 3)
-                         (make-hook 3)
-                         (make-hook 3)
-                         (make-hook 3)
-                         (make-hook 3)
-                         (make-hook 3))))
-    ;; Register callbacks to run hooks.
-    (%tox-callback-friend-request
-     pointer
-     (procedure->pointer
-      void
-      (lambda (ptr public-key message length user-data)
-        (run-hook (tox-friend-request-hook tox)
-                  tox
-                  (pointer->bytevector public-key tox-client-id-size)
-                  (utf8-pointer->string message length)))
-      (list '* '* '* uint16 '*))
-     %null-pointer)
-
-    (%tox-callback-friend-message
-     pointer
-     (procedure->pointer
-      void
-      (lambda (ptr friend-number message length user-data)
-        (run-hook (tox-message-hook tox)
-                  tox
-                  friend-number
-                  (utf8-pointer->string message length)))
-      (list '* int32 '* uint16 '*))
-     %null-pointer)
-
-    (%tox-callback-friend-action
-     pointer
-     (procedure->pointer
-      void
-      (lambda (ptr friend-number action length user-data)
-        (run-hook (tox-message-hook tox)
-                  tox
-                  friend-number
-                  (utf8-pointer->string action length)))
-      (list '* int32 '* uint16 '*))
-     %null-pointer)
-
-    (%tox-callback-name-change
-     pointer
-     (procedure->pointer
-      void
-      (lambda (ptr friend-number name length user-data)
-        (run-hook (tox-name-change-hook tox)
-                  tox
-                  friend-number
-                  (utf8-pointer->string name length)))
-      (list '* int32 '* uint16 '*))
-     %null-pointer)
-
-    (%tox-callback-status-message
-     pointer
-     (procedure->pointer
-      void
-      (lambda (ptr friend-number message length user-data)
-        (run-hook (tox-status-message-hook tox)
-                  tox
-                  friend-number
-                  (utf8-pointer->string message length)))
-      (list '* int32 '* uint16 '*))
-     %null-pointer)
-
-    (%tox-callback-user-status
-     pointer
-     (procedure->pointer
-      void
-      (lambda (ptr friend-number status user-data)
-        (run-hook (tox-status-hook tox)
-                  tox
-                  friend-number
-                  status))
-      (list '* int32 uint8 '*))
-     %null-pointer)
-
-    (%tox-callback-typing-change
-     pointer
-     (procedure->pointer
-      void
-      (lambda (ptr friend-number typing user-data)
-        (run-hook (tox-typing-hook tox)
-                  tox
-                  friend-number
-                  (one? typing)))
-      (list '* int32 uint8 '*))
-     %null-pointer)
-
-    (%tox-callback-read-receipt
-     pointer
-     (procedure->pointer
-      void
-      (lambda (ptr friend-number receipt user-data)
-        (run-hook (tox-read-receipt-hook tox)
-                  tox
-                  friend-number
-                  receipt))
-      (list '* int32 int32 '*))
-     %null-pointer)
-
-    (%tox-callback-connection-status
-     pointer
-     (procedure->pointer
-      void
-      (lambda (ptr friend-number status user-data)
-        (run-hook (tox-online-hook tox)
-                  tox
-                  friend-number
-                  (one? status)))
-      (list '* int32 uint8 '*))
-     %null-pointer)
-
-    tox))
-
-(define (unwrap-tox tox)
-  (tox-pointer tox))
+  ;; Register all callback functions.
+  (%tox-callback-friend-request pointer
+                                friend-request-callback
+                                %null-pointer)
+  (%tox-callback-friend-message pointer
+                                friend-message-callback
+                                %null-pointer)
+  (%tox-callback-friend-action pointer
+                               friend-action-callback
+                               %null-pointer)
+  (%tox-callback-name-change pointer
+                             name-change-callback
+                             %null-pointer)
+  (%tox-callback-status-message pointer
+                                status-message-callback
+                                %null-pointer)
+  (%tox-callback-user-status pointer
+                             user-status-callback
+                             %null-pointer)
+  (%tox-callback-typing-change pointer
+                               typing-change-callback
+                               %null-pointer)
+  (%tox-callback-read-receipt pointer
+                              read-receipt-callback
+                              %null-pointer)
+  (%tox-callback-connection-status pointer
+                                   connection-status-callback
+                                   %null-pointer)
+  (%wrap-tox pointer))
 
 (define-syntax-rule (define/unwrap name docstring proc)
   (define (name tox)
