@@ -185,3 +185,12 @@
 
 (define-tox tox-set-nospam
   void "tox_set_nospam" (list '* uint32))
+
+(define-tox tox-callback-group-invite
+  void "tox_callback_group_invite" '(* * *))
+
+(define-tox tox-callback-group-message
+  void "tox_callback_group_message" '(* * *))
+
+(define-tox tox-callback-group-action
+  void "tox_callback_group_action" '(* * *))
