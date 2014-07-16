@@ -206,3 +206,6 @@
 
 (define-tox tox-group-peername
   int "tox_group_peername" (list '* int int '*))
+
+(define-tox tox-invite-friend
+  int "tox_invite_friend" (list '* int32 int))

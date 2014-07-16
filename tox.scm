@@ -58,7 +58,7 @@
             tox-friend-list
             set-tox-nospam tox-nospam
             tox-add-group-chat tox-delete-group-chat
-            tox-group-peer-name))
+            tox-group-peer-name tox-invite-friend))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -585,3 +585,9 @@ group or peer."
                                       peer-number
                                       (bytevector->pointer bv))))
     (if (negative? length) #f (utf8-pointer->string bv length))))
+
+(define (tox-invite-friend tox friend-number group-number)
+  "Invite the friend identified by FRIEND-NUMBER to join the group identified
+by GROUP-NUMBER.  Return #t on success, or #f if the friend or group is
+invalid."
+  (zero? (%tox-invite-friend (unwrap-tox tox) friend-number group-number)))
