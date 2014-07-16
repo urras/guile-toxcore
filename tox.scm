@@ -58,7 +58,8 @@
             tox-friend-list
             set-tox-nospam tox-nospam
             tox-add-group-chat tox-delete-group-chat
-            tox-group-peer-name tox-invite-friend))
+            tox-group-peer-name tox-invite-friend
+            tox-join-group-chat))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -591,3 +592,12 @@ group or peer."
 by GROUP-NUMBER.  Return #t on success, or #f if the friend or group is
 invalid."
   (zero? (%tox-invite-friend (unwrap-tox tox) friend-number group-number)))
+
+(define (tox-join-group-chat tox friend-number public-key)
+  "Join the group identified by bytevector PUBLIC-KEY that the friend
+identified by FRIEND-NUMBER for the messenger TOX.  Return the group number on
+success, of #f otherwise."
+  (false-if-negative
+   (%tox-join-groupchat (unwrap-tox tox)
+                        friend-number
+                        (bytevector->pointer public-key))))

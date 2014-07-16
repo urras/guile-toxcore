@@ -209,3 +209,6 @@
 
 (define-tox tox-invite-friend
   int "tox_invite_friend" (list '* int32 int))
+
+(define-tox tox-join-groupchat
+  int "tox_join_groupchat" (list '* int32 '*))
