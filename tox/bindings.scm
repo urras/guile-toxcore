@@ -194,3 +194,6 @@
 
 (define-tox tox-callback-group-action
   void "tox_callback_group_action" '(* * *))
+
+(define-tox tox-callback-group-namelist-change
+  void "tox_callback_group_namelist_change" '(* * *))
