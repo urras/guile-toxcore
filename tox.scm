@@ -56,7 +56,8 @@
             set-tox-send-receipts
             tox-friend-count tox-online-friend-count
             tox-friend-list
-            set-tox-nospam tox-nospam))
+            set-tox-nospam tox-nospam
+            tox-add-group-chat tox-delete-group-chat))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -561,3 +562,14 @@ TOX."
 (define/unwrap tox-nospam
   "Return the 'nospam' part of the address for the messenger TOX."
   %tox-get-nospam)
+
+(define (tox-add-group-chat tox)
+  "Create a new group chat for the messenger TOX and return the group number,
+or #f on failure."
+  (let ((result (%tox-add-groupchat (unwrap-tox tox))))
+    (if (negative? result) #f result)))
+
+(define (tox-delete-group-chat tox group-number)
+  "Remove the group chat identified by GROUP-NUMBER from the messsenger TOX.
+Return #t on success, #f otherwise."
+  (zero? (%tox-del-groupchat (unwrap-tox tox) group-number)))

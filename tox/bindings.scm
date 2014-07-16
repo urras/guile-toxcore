@@ -197,3 +197,9 @@
 
 (define-tox tox-callback-group-namelist-change
   void "tox_callback_group_namelist_change" '(* * *))
+
+(define-tox tox-add-groupchat
+  int "tox_add_groupchat" '(*))
+
+(define-tox tox-del-groupchat
+  int "tox_del_groupchat" (list '* int))
