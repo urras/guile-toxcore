@@ -57,7 +57,8 @@
             tox-friend-count tox-online-friend-count
             tox-friend-list
             set-tox-nospam tox-nospam
-            tox-add-group-chat tox-delete-group-chat))
+            tox-add-group-chat tox-delete-group-chat
+            tox-group-peer-name))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -573,3 +574,14 @@ or #f on failure."
   "Remove the group chat identified by GROUP-NUMBER from the messsenger TOX.
 Return #t on success, #f otherwise."
   (zero? (%tox-del-groupchat (unwrap-tox tox) group-number)))
+
+(define (tox-group-peer-name tox group-number peer-number)
+  "Return the name of the peer identified by PEER-NUMBER in the group
+identified by GROUP-NUMBER for the messenger TOX, or #f if there is no such
+group or peer."
+  (let* ((bv (make-bytevector tox-max-name-length))
+         (length (%tox-group-peername (unwrap-tox tox)
+                                      group-number
+                                      peer-number
+                                      (bytevector->pointer bv))))
+    (if (negative? length) #f (utf8-pointer->string bv length))))

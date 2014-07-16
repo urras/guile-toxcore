@@ -203,3 +203,6 @@
 
 (define-tox tox-del-groupchat
   int "tox_del_groupchat" (list '* int))
+
+(define-tox tox-group-peername
+  int "tox_group_peername" (list '* int int '*))
