@@ -59,7 +59,8 @@
             set-tox-nospam tox-nospam
             tox-add-group-chat tox-delete-group-chat
             tox-group-peer-name tox-invite-friend
-            tox-join-group-chat))
+            tox-join-group-chat
+            tox-group-send-message tox-group-send-action))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -601,3 +602,23 @@ success, of #f otherwise."
    (%tox-join-groupchat (unwrap-tox tox)
                         friend-number
                         (bytevector->pointer public-key))))
+
+(define (group-send proc tox group-number message)
+  (zero?
+   (let ((bv (string->utf8 message)))
+     (proc (unwrap-tox tox)
+           group-number
+           (bytevector->pointer bv)
+           (bytevector-length bv)))))
+
+(define (tox-group-send-message tox group-number message)
+  "Send the string MESSAGE to the group identified by GROUP-NUMBER in the
+messenger TOX.  Return #t on success, or #f if no such group exists or the
+message is invalid."
+  (group-send %tox-group-message-send tox group-number message))
+
+(define (tox-group-send-action tox group-number action)
+  "Send the string MESSAGE to the group identified by GROUP-NUMBER in the
+messenger TOX.  Return #t on success, or #f if no such group exists or the
+message is invalid."
+  (group-send %tox-group-action-send tox group-number action))

@@ -212,3 +212,9 @@
 
 (define-tox tox-join-groupchat
   int "tox_join_groupchat" (list '* int32 '*))
+
+(define-tox tox-group-message-send
+  int "tox_group_message_send" (list '* int '* uint32))
+
+(define-tox tox-group-action-send
+  int "tox_group_action_send" (list '* int '* uint32))
