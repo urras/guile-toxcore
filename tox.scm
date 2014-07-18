@@ -60,7 +60,8 @@
             tox-add-group-chat tox-delete-group-chat
             tox-group-peer-name tox-invite-friend
             tox-join-group-chat
-            tox-group-send-message tox-group-send-action))
+            tox-group-send-message tox-group-send-action
+            tox-group-peer-count))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -622,3 +623,11 @@ message is invalid."
 messenger TOX.  Return #t on success, or #f if no such group exists or the
 message is invalid."
   (group-send %tox-group-action-send tox group-number action))
+
+(define (tox-group-peer-count tox group-number)
+  "Return the number of peers in the group identified by GROUP-NUMBER in the
+messenger TOX."
+  (let ((result (%tox-group-number-peers (unwrap-tox tox) group-number)))
+    (if (negative? result)
+        (error "Invalid group number: " group-number)
+        result)))

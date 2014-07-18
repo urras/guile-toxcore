@@ -218,3 +218,6 @@
 
 (define-tox tox-group-action-send
   int "tox_group_action_send" (list '* int '* uint32))
+
+(define-tox tox-group-number-peers
+  int "tox_group_number_peers" (list '* int))
