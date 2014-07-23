@@ -224,3 +224,9 @@
 
 (define-tox tox-group-get-names
   int "tox_group_get_names" (list '* int '* '* int))
+
+(define-tox tox-count-chatlist
+  uint32 "tox_count_chatlist" '(*))
+
+(define-tox tox-get-chatlist
+  uint32 "tox_get_chatlist" (list '* '* uint32))

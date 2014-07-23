@@ -24,6 +24,7 @@
 (define-module (tox)
   #:use-module (ice-9 format)
   #:use-module (rnrs bytevectors)
+  #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-4)
   #:use-module (system foreign)
   #:use-module ((tox bindings) #:prefix %)
@@ -61,7 +62,8 @@
             tox-group-peer-name tox-invite-friend
             tox-join-group-chat
             tox-group-send-message tox-group-send-action
-            tox-group-peer-count tox-group-peer-names))
+            tox-group-peer-count tox-group-peer-names
+            tox-group-chat-count tox-group-chat-list))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -652,3 +654,18 @@ messenger TOX."
                  (utf8->string
                   (bytevector-slice names start (+ start length)))))
              (iota result-length)))))
+
+(define/unwrap tox-group-chat-count
+  "Return the number of group chats in the messenger TOX."
+  %tox-count-chatlist)
+
+(define (tox-group-chat-list tox)
+  "Return a list of chat IDs in the messenger TOX."
+  (let* ((length (tox-group-chat-count tox))
+         (bv (make-s32vector length))
+         (result-length
+          (%tox-get-chatlist (unwrap-tox tox)
+                             (bytevector->pointer bv)
+                             length)))
+    (take (bytevector->sint-list bv (native-endianness) (sizeof int))
+          result-length)))
