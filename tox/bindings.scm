@@ -221,3 +221,6 @@
 
 (define-tox tox-group-number-peers
   int "tox_group_number_peers" (list '* int))
+
+(define-tox tox-group-get-names
+  int "tox_group_get_names" (list '* int '* '* int))

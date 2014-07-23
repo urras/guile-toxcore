@@ -61,7 +61,7 @@
             tox-group-peer-name tox-invite-friend
             tox-join-group-chat
             tox-group-send-message tox-group-send-action
-            tox-group-peer-count))
+            tox-group-peer-count tox-group-peer-names))
 
 (define-enumeration tox-friend-add-error
   (too-long -1)
@@ -631,3 +631,23 @@ messenger TOX."
     (if (negative? result)
         (error "Invalid group number: " group-number)
         result)))
+
+(define (tox-group-peer-names tox group-number)
+  "Return a list of peer names for the group identified by GROUP-NUMBER in the
+messenger TOX."
+  (let* ((length (tox-group-peer-count tox group-number))
+         (names (make-u8vector (* length tox-max-name-length)))
+         (lengths (make-u16vector length))
+         (result (%tox-group-get-names (unwrap-tox tox)
+                                       group-number
+                                       (bytevector->pointer names)
+                                       (bytevector->pointer lengths)
+                                       length)))
+    (if (and (number? result) (negative? result))
+        (error "Invalid group number: " group-number)
+        (map (lambda (i)
+               (let ((start (* i tox-max-name-length))
+                     (length (u16vector-ref lengths i)))
+                 (utf8->string
+                  (bytevector-slice names start (+ start length)))))
+             (iota length)))))
