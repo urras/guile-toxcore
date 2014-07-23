@@ -638,16 +638,17 @@ messenger TOX."
   (let* ((length (tox-group-peer-count tox group-number))
          (names (make-u8vector (* length tox-max-name-length)))
          (lengths (make-u16vector length))
-         (result (%tox-group-get-names (unwrap-tox tox)
-                                       group-number
-                                       (bytevector->pointer names)
-                                       (bytevector->pointer lengths)
-                                       length)))
-    (if (and (number? result) (negative? result))
+         (result-length
+          (%tox-group-get-names (unwrap-tox tox)
+                                group-number
+                                (bytevector->pointer names)
+                                (bytevector->pointer lengths)
+                                length)))
+    (if (negative? result-length)
         (error "Invalid group number: " group-number)
         (map (lambda (i)
                (let ((start (* i tox-max-name-length))
                      (length (u16vector-ref lengths i)))
                  (utf8->string
                   (bytevector-slice names start (+ start length)))))
-             (iota length)))))
+             (iota result-length)))))
