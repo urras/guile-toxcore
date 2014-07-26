@@ -232,34 +232,23 @@ transcoding the hexadecimal string ADDRESS."
      (list '* int32 uint8 '*)))
 
 (define (wrap-tox pointer)
-  ;; Register all callback functions.
-  (%tox-callback-friend-request pointer
-                                friend-request-callback
-                                %null-pointer)
-  (%tox-callback-friend-message pointer
-                                friend-message-callback
-                                %null-pointer)
-  (%tox-callback-friend-action pointer
-                               friend-action-callback
-                               %null-pointer)
-  (%tox-callback-name-change pointer
-                             name-change-callback
-                             %null-pointer)
-  (%tox-callback-status-message pointer
-                                status-message-callback
-                                %null-pointer)
-  (%tox-callback-user-status pointer
-                             user-status-callback
-                             %null-pointer)
-  (%tox-callback-typing-change pointer
-                               typing-change-callback
-                               %null-pointer)
-  (%tox-callback-read-receipt pointer
-                              read-receipt-callback
-                              %null-pointer)
-  (%tox-callback-connection-status pointer
-                                   connection-status-callback
-                                   %null-pointer)
+  (define-syntax register-callbacks
+    (syntax-rules ()
+      ((_ ((set-callback callback) ...))
+       (begin
+         (set-callback pointer callback %null-pointer)
+         ...))))
+
+  (register-callbacks
+   ((%tox-callback-friend-request friend-request-callback)
+    (%tox-callback-friend-message friend-message-callback)
+    (%tox-callback-friend-action friend-action-callback)
+    (%tox-callback-name-change name-change-callback)
+    (%tox-callback-status-message status-message-callback)
+    (%tox-callback-user-status user-status-callback)
+    (%tox-callback-typing-change typing-change-callback)
+    (%tox-callback-read-receipt read-receipt-callback)
+    (%tox-callback-connection-status connection-status-callback)))
   (%wrap-tox pointer))
 
 (define-syntax-rule (define/unwrap name docstring proc)
