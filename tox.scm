@@ -120,6 +120,10 @@ transcoding the hexadecimal string ADDRESS."
     (format port "#<<tox> ~x>"
             (pointer-address (unwrap-tox tox)))))
 
+;;;
+;;; Hooks
+;;;
+
 (define-syntax-rule (define-tox-hook name)
   (define name (make-hook 3)))
 
@@ -250,6 +254,10 @@ transcoding the hexadecimal string ADDRESS."
     (%tox-callback-read-receipt read-receipt-callback)
     (%tox-callback-connection-status connection-status-callback)))
   (%wrap-tox pointer))
+
+;;;
+;;; Core API
+;;;
 
 (define-syntax-rule (define/unwrap name docstring proc)
   (define (name tox)
@@ -558,6 +566,10 @@ TOX."
   "Return the 'nospam' part of the address for the messenger TOX."
   %tox-get-nospam)
 
+;;;
+;;; Group Chat
+;;;
+
 (define (tox-add-group-chat tox)
   "Create a new group chat for the messenger TOX and return the group number,
 or #f on failure."
@@ -658,3 +670,7 @@ messenger TOX."
                              length)))
     (take (bytevector->sint-list bv (native-endianness) (sizeof int))
           result-length)))
+
+;;;
+;;; TODO: File Transfer
+;;;
