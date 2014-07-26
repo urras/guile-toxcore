@@ -30,7 +30,7 @@
   #:use-module ((tox bindings) #:prefix %)
   #:use-module (tox util)
   #:export (tox-friend-add-error
-            tox-user-status
+            tox-user-status tox-chat-event tox-file-control
             tox-max-name-length tox-max-message-length
             tox-max-status-message-length
             tox-client-id-size tox-friend-address-size
