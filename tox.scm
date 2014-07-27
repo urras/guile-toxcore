@@ -221,12 +221,10 @@ transcoding the hexadecimal string ADDRESS."
            (one? status)))
 
 (define (wrap-tox pointer)
-  (define-syntax register-callbacks
-    (syntax-rules ()
-      ((_ ((set-callback callback) ...))
-       (begin
-         (set-callback pointer callback %null-pointer)
-         ...))))
+  (define-syntax-rule (register-callbacks ((set-callback callback) ...))
+    (begin
+      (set-callback pointer callback %null-pointer)
+      ...))
 
   (register-callbacks
    ((%tox-callback-friend-request friend-request-callback)
