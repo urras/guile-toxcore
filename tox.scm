@@ -573,7 +573,7 @@ group or peer."
                                       group-number
                                       peer-number
                                       (bytevector->pointer bv))))
-    (if (negative? length) #f (utf8-pointer->string bv length))))
+    (if (negative? length) #f (utf8->string (bytevector-slice bv 0 length)))))
 
 (define (tox-invite-friend tox friend-number group-number)
   "Invite the friend identified by FRIEND-NUMBER to join the group identified
