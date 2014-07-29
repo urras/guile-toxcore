@@ -39,6 +39,8 @@
             tox-friend-request-hook tox-message-hook tox-action-hook
             tox-name-change-hook tox-status-message-hook tox-status-hook
             tox-typing-hook tox-read-receipt-hook tox-online-hook
+            tox-group-invite-hook tox-group-message-hook
+            tox-group-action-hook tox-group-peer-hook
             tox? tox-connected?
             tox-do-interval tox-do
             tox-size tox-save tox-load! tox-load
@@ -124,8 +126,12 @@ transcoding the hexadecimal string ADDRESS."
 ;;; Hooks
 ;;;
 
-(define-syntax-rule (define-tox-hook name)
-  (define name (make-hook 3)))
+(define-syntax define-tox-hook
+  (syntax-rules ()
+    ((_ name)
+     (define name (make-hook 3)))
+    ((_ name arity)
+     (define name (make-hook arity)))))
 
 (define-syntax-rule (define-tox-callback (name (type arg) ...) body ...)
   (define name
@@ -220,6 +226,51 @@ transcoding the hexadecimal string ADDRESS."
            friend-number
            (one? status)))
 
+(define-tox-hook tox-group-invite-hook)
+
+(define-tox-callback (group-invite-callback ('* tox) (int friend-number)
+                                            ('* group-public-key)
+                                            ('* user-data))
+  (run-hook tox-group-invite-hook
+            (%wrap-tox tox)
+            friend-number
+            (pointer->bytevector group-public-key tox-friend-address-size)))
+
+(define-tox-hook tox-group-message-hook 4)
+
+(define-tox-callback (group-message-callback ('* tox) (int group-number)
+                                             (int peer-number)
+                                             ('* message) (uint16 length)
+                                             ('* user-data))
+  (run-hook tox-group-message-hook
+            (%wrap-tox tox)
+            group-number
+            peer-number
+            (utf8-pointer->string message length)))
+
+(define-tox-hook tox-group-action-hook 4)
+
+(define-tox-callback (group-action-callback ('* tox) (int group-number)
+                                            (int peer-number)
+                                            ('* action) (uint16 length)
+                                            ('* user-data))
+  (run-hook tox-group-action-hook
+            (%wrap-tox tox)
+            group-number
+            peer-number
+            (utf8-pointer->string action length)))
+
+(define-tox-hook tox-group-peer-hook 4)
+
+(define-tox-callback (group-peer-callback ('* tox) (int group-number)
+                                          (int peer-number)
+                                          (int event) ('* user-data))
+  (run-hook tox-group-peer-hook
+            (%wrap-tox tox)
+            group-number
+            peer-number
+            event))
+
 (define (wrap-tox pointer)
   (define-syntax-rule (register-callbacks ((set-callback callback) ...))
     (begin
@@ -235,7 +286,11 @@ transcoding the hexadecimal string ADDRESS."
     (%tox-callback-user-status user-status-callback)
     (%tox-callback-typing-change typing-change-callback)
     (%tox-callback-read-receipt read-receipt-callback)
-    (%tox-callback-connection-status connection-status-callback)))
+    (%tox-callback-connection-status connection-status-callback)
+    (%tox-callback-group-invite group-invite-callback)
+    (%tox-callback-group-message group-message-callback)
+    (%tox-callback-group-action group-action-callback)
+    (%tox-callback-group-namelist-change group-peer-callback)))
   (%wrap-tox pointer))
 
 ;;;
