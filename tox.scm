@@ -41,6 +41,7 @@
             tox-typing-hook tox-read-receipt-hook tox-online-hook
             tox-group-invite-hook tox-group-message-hook
             tox-group-action-hook tox-group-peer-hook
+            tox-file-send-request-hook tox-file-control-hook tox-file-data-hook
             tox? tox-connected?
             tox-do-interval tox-do
             tox-size tox-save tox-load! tox-load
@@ -271,6 +272,48 @@ transcoding the hexadecimal string ADDRESS."
             peer-number
             event))
 
+(define-tox-hook tox-file-send-request-hook 5)
+
+(define-tox-callback (file-send-request-callback ('* tox) (int32 friend-number)
+                                                 (uint8 file-number)
+                                                 (uint64 file-size)
+                                                 ('* file-name)
+                                                 (uint16 file-name-length)
+                                                 ('* user-data))
+  (run-hook tox-file-send-request-hook
+            (%wrap-tox tox)
+            friend-number
+            file-number
+            file-size
+            (utf8-pointer->string file-name file-name-length)))
+
+(define-tox-hook tox-file-control-hook 6)
+
+(define-tox-callback (file-control-callback ('* tox) (int32 friend-number)
+                                            (uint8 mode) (uint8 file-number)
+                                            (uint8 event)
+                                            ('* data) (uint16 length)
+                                            ('* user-data))
+  (run-hook tox-file-control-hook
+            (%wrap-tox tox)
+            friend-number
+            file-number
+            (if (zero? mode) 'receive 'send)
+            event
+            (pointer->bytevector data length)))
+
+(define-tox-hook tox-file-data-hook 4)
+
+(define-tox-callback (file-data-callback ('* tox) (int32 friend-number)
+                                         (uint8 file-number)
+                                         ('* data) (uint16 length)
+                                         ('* user-data))
+  (run-hook tox-file-data-hook
+            (%wrap-tox tox)
+            friend-number
+            file-number
+            (bytevector->pointer data length)))
+
 (define (wrap-tox pointer)
   (define-syntax-rule (register-callbacks ((set-callback callback) ...))
     (begin
@@ -290,7 +333,10 @@ transcoding the hexadecimal string ADDRESS."
     (%tox-callback-group-invite group-invite-callback)
     (%tox-callback-group-message group-message-callback)
     (%tox-callback-group-action group-action-callback)
-    (%tox-callback-group-namelist-change group-peer-callback)))
+    (%tox-callback-group-namelist-change group-peer-callback)
+    (%tox-callback-file-send-request file-send-request-callback)
+    (%tox-callback-file-control file-control-callback)
+    (%tox-callback-file-data file-data-callback)))
   (%wrap-tox pointer))
 
 ;;;

@@ -230,3 +230,12 @@
 
 (define-tox tox-get-chatlist
   uint32 "tox_get_chatlist" (list '* '* uint32))
+
+(define-tox tox-callback-file-send-request
+  void "tox_callback_file_send_request" '(* * *))
+
+(define-tox tox-callback-file-control
+  void "tox_callback_file_control" '(* * *))
+
+(define-tox tox-callback-file-data
+  void "tox_callback_file_data" '(* * *))
