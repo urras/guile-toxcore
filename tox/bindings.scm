@@ -239,3 +239,18 @@
 
 (define-tox tox-callback-file-data
   void "tox_callback_file_data" '(* * *))
+
+(define-tox tox-new-file-sender
+  int "tox_new_file_sender" (list '* int32 uint64 '* uint16))
+
+(define-tox tox-file-send-control
+  int "tox_file_send_control" (list '* int32 uint8 uint8 uint8 '* uint16))
+
+(define-tox tox-file-send-data
+  int "tox_file_send_data" (list '* int32 uint8 '* uint16))
+
+(define-tox tox-file-data-size
+  int "tox_file_data_size" (list '* int32))
+
+(define-tox tox-file-data-remaining
+  uint64 "tox_file_data_remaining" (list '* int32 uint8 uint8))
