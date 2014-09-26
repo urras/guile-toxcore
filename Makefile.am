@@ -22,6 +22,7 @@ godir=$(libdir)/guile/2.0/ccache
 SOURCES = 					\
   tox/util.scm					\
   tox/bindings.scm				\
-  tox.scm
+  tox.scm					\
+  tox/group-chat.scm
 
 EXTRA_DIST += env.in
