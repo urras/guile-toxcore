@@ -57,7 +57,6 @@
             tox-status tox-friend-status
             tox-friend-last-online
             set-tox-friend-typing tox-friend-typing?
-            set-tox-send-receipts
             tox-friend-count tox-online-friend-count
             tox-friend-list
             set-tox-nospam tox-nospam
@@ -484,43 +483,33 @@ in the messenger TOX, or #f if no such friend exists."
   "Return #t if friend identified by FRIEND-NUMBER exists, #f otherwise."
   (one? (%tox-friend-exists (unwrap-tox tox) friend-number)))
 
-(define (tox-send tox send send-with-id friend-number message id)
+(define (tox-send tox send friend-number message)
   (let* ((tox (unwrap-tox tox))
          (message (string->utf8 message))
          (ptr (bytevector->pointer message))
          (length (bytevector-length message)))
     (false-if-zero
-     (if id
-         (send-with-id tox friend-number id ptr length)
-         (send tox friend-number ptr length)))))
+     (send tox friend-number ptr length))))
 
-(define* (tox-send-message tox friend-number message #:optional (id #f))
+(define (tox-send-message tox friend-number message)
   "Send the string MESSAGE to the friend identified by FRIEND-NUMBER in the
-messenger TOX.  Optionally, a message ID may be given.  If omitted, an id is
-automatically generated.  MESSAGE length may not exceed
-tox-max-message-length.
+messenger TOX.  MESSAGE length may not exceed tox-max-message-length.
 
 Return the message id on success, #f otherwise."
   (tox-send tox
             %tox-send-message
-            %tox-send-message-withid
             friend-number
-            message
-            id))
+            message))
 
-(define* (tox-send-action tox friend-number action #:optional (id #f))
+(define (tox-send-action tox friend-number action)
   "Send the string ACTION to the friend identified by FRIEND-NUMBER in the
-messenger TOX.  Optionally, a message ID may be given.  If omitted, an id is
-automatically generated.  MESSAGE length may not exceed
-tox-max-message-length.
+messenger TOX.  MESSAGE length may not exceed tox-max-message-length.
 
 Return the message id on success, #f otherwise."
   (tox-send tox
             %tox-send-action
-            %tox-send-action-withid
             friend-number
-            action
-            id))
+            action))
 
 (define (set-tox-name tox name)
   "Use the nickname NAME for the messenger TOX."
@@ -617,13 +606,6 @@ messenger TOX."
 typing, or #f otherwise."
   (one? (%tox-get-is-typing (unwrap-tox tox) friend-number)))
 
-(define (set-tox-send-receipts tox friend-number send-receipts?)
-  "Set whether to send receipts to the friend identified by FRIEND-NUMBER in
-the messenger TOX.  SEND-RECEIPTS? should be either #t of #f."
-  (%tox-set-sends-receipts (unwrap-tox tox)
-                           friend-number
-                           (boolean->number send-receipts?)))
-
 (define/unwrap tox-friend-count
   "Return the number of friends in the friend list for the messenger TOX."
   %tox-count-friendlist)
@@ -644,7 +626,7 @@ TOX."
 
 (define (set-tox-nospam tox nospam)
   "Set the 'nospam' part of the address for the messenger TOX."
-  (%tox-set-nospam (unwrap-tox tox) nospam))
+  (%tox-set-snospam (unwrap-tox tox) nospam))
 
 (define/unwrap tox-nospam
   "Return the 'nospam' part of the address for the messenger TOX."

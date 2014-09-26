@@ -84,14 +84,8 @@
 (define-tox tox-send-message
   uint32 "tox_send_message" (list '* int32 '* uint32))
 
-(define-tox tox-send-message-withid
-  uint32 "tox_send_message_withid" (list '* int32 uint32 '* uint32))
-
 (define-tox tox-send-action
   uint32 "tox_send_action" (list '* int32 '* uint32))
-
-(define-tox tox-send-action-withid
-  uint32 "tox_send_action_withid" (list '* int32 uint32 '* uint32))
 
 (define-tox tox-set-name
   int "tox_set_name" (list '* '* uint16))
@@ -140,9 +134,6 @@
 
 (define-tox tox-get-is-typing
   uint8 "tox_get_is_typing" (list '* int32))
-
-(define-tox tox-set-sends-receipts
-  void "tox_set_sends_receipts" (list '* int32 int))
 
 (define-tox tox-count-friendlist
   uint32 "tox_count_friendlist" '(*))
