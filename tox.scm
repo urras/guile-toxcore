@@ -626,7 +626,7 @@ TOX."
 
 (define (set-tox-nospam tox nospam)
   "Set the 'nospam' part of the address for the messenger TOX."
-  (%tox-set-snospam (unwrap-tox tox) nospam))
+  (%tox-set-nospam (unwrap-tox tox) nospam))
 
 (define/unwrap tox-nospam
   "Return the 'nospam' part of the address for the messenger TOX."
