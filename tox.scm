@@ -347,10 +347,9 @@ transcoding the hexadecimal string ADDRESS."
     docstring
     (proc (unwrap-tox tox))))
 
-(define* (make-tox #:optional (ipv6-enabled? #t))
-  "Return a newly allocated Tox messenger.  IPV6-ENABLED? indicates whether to
-create a IPv4 or IPv6 socket.  By default, an IPv6 socket is created."
-  (let ((ptr (%tox-new (boolean->number ipv6-enabled?))))
+(define (make-tox)
+  "Return a newly allocated Tox messenger object."
+  (let ((ptr (%tox-new %null-pointer)))
     (if (null-pointer? ptr)
         (error "Failed to create Tox messenger")
         (wrap-tox ptr))))

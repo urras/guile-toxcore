@@ -31,7 +31,7 @@
     (pointer->procedure return (dynamic-func c-name libtoxcore) args)))
 
 (define-tox tox-new
-  '* "tox_new" (list uint8))
+  '* "tox_new" '(*))
 
 (define-tox tox-kill
   void "tox_kill" '(*))
