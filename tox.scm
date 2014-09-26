@@ -330,9 +330,31 @@ transcoding the hexadecimal string ADDRESS."
 ;;; Core API
 ;;;
 
-(define (make-tox)
+(define* (make-tox #:optional #:key (ipv6? #t) (udp? #t) proxy?
+                   (proxy-address "localhost") (proxy-port 8080))
   "Return a newly allocated Tox messenger object."
-  (let ((ptr (%tox-new %null-pointer)))
+  (when (> (string-length proxy-address) 255)
+    (error "proxy address cannot be longer than 255 characters: "
+           proxy-address))
+
+  ;; Convert proxy-address into a list of 256 uint8s for the FFI.  Pretty
+  ;; gross, but there's no other way to fill the buffer.
+  (let* ((proxy-address
+          (map char->integer
+               (string->list
+                (string-append proxy-address
+                               (make-string (- 256
+                                               (string-length proxy-address))
+                                            #\nul)))))
+         ;; Build a pointer to a Tox_Options struct.
+         (options (make-c-struct (list uint8 uint8 uint8
+                                       (make-list 256 uint8) uint16)
+                                 (list (boolean->number ipv6?)
+                                       (boolean->number udp?)
+                                       (boolean->number proxy?)
+                                       proxy-address
+                                       proxy-port)))
+         (ptr (%tox-new options)))
     (if (null-pointer? ptr)
         (error "Failed to create Tox messenger")
         (wrap-tox* ptr))))
