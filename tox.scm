@@ -406,23 +406,19 @@ TOX."
 otherwise."
   (one? (%tox-isconnected (unwrap-tox tox))))
 
-(define (tox-bootstrap-from-address tox address ipv6-enabled? port public-key)
+(define (tox-bootstrap-from-address tox address port public-key)
   "Resolve ADDRESS into an IP address.  If successful, send a 'get
 nodes' request to the given node with IP, PORT, and PUBLIC-KEY to
 setup connections.
 
-ADDRESS can be a hostname or an IP address (IPv4 or IPv6).  If
-IPV6-ENABLED? is #f, the resolving sticks strictly to IPv4 addresses.
-If IPV6-ENABLED? is #t, the resolving procedure looks for IPv6
-addresses first, then IPv4 addresses.  PUBLIC-KEY is a 32 byte long
-bytevector.
+ADDRESS can be a hostname or an IP address.
+PUBLIC-KEY is a 32 byte long bytevector.
 
 Return #t if ADDRESS could be converted into an IP address, #f
 otherwise."
   (one? (%tox-bootstrap-from-address
          (unwrap-tox tox)
          (string->pointer address)
-         (boolean->number ipv6-enabled?)
          (htons port)
          (bytevector->pointer public-key))))
 

@@ -55,7 +55,7 @@
   int "tox_isconnected" '(*))
 
 (define-tox tox-bootstrap-from-address
-  int "tox_bootstrap_from_address" (list '* '* uint8 uint16 '*))
+  int "tox_bootstrap_from_address" (list '* '* uint16 '*))
 
 (define-tox tox-get-address
   void "tox_get_address" '(* *))
