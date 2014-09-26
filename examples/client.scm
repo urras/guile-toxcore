@@ -14,7 +14,7 @@
                   (tox-bootstrap-from-address
                    tox
                    (assq-ref node 'ip)
-                   (assq-ref node 'port)
+                   (or (assq-ref node 'port) 33445)
                    (tox-client-id (assq-ref node 'id))))
                 tox-bootstrap-nodes)))
 
