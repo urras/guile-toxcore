@@ -402,7 +402,7 @@ otherwise."
   (one? (%tox-bootstrap-from-address
          (unwrap-tox tox)
          (string->pointer address)
-         (htons port)
+         port
          (bytevector->pointer public-key))))
 
 (define (tox-address tox)

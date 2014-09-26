@@ -32,9 +32,7 @@
             hex-string->bytevector bytevector->hex-string
             utf8-pointer->string
             bytevector-slice
-            false-if-negative false-if-zero
-            htons)
-  #:replace (htons))
+            false-if-negative false-if-zero))
 
 (define-wrapped-pointer-type <tox>
   tox? wrap-tox unwrap-tox
@@ -116,9 +114,3 @@ index BEGIN, inclusive, to the index END, exclusive."
 (define (false-if-zero n)
   "Return #f is N is zero, or N otherwise."
   (if (zero? n) #f n))
-
-;; The htons available in Guile has been deprecated as of version 2.0.11.
-(define (htons n)
-  "Converts the unsigned short integer N from host byte order to network byte
-order.  N is assumed to be a positive integer in the range [0, 65535]."
-  (logand (logior (ash n 8) (ash n -8)) #xffff))
