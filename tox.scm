@@ -22,13 +22,13 @@
 ;;; Code:
 
 (define-module (tox)
-  #:use-module (ice-9 format)
   #:use-module (rnrs bytevectors)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-4)
   #:use-module (system foreign)
   #:use-module ((tox bindings) #:prefix %)
   #:use-module (tox util)
+  #:re-export (tox?)
   #:export (tox-friend-add-error
             tox-user-status tox-chat-event tox-file-control
             tox-max-name-length tox-max-message-length
@@ -42,7 +42,7 @@
             tox-group-invite-hook tox-group-message-hook
             tox-group-action-hook tox-group-peer-hook
             tox-file-send-request-hook tox-file-control-hook tox-file-data-hook
-            tox? tox-connected?
+            tox-connected?
             tox-do-interval tox-do
             tox-size tox-save tox-load! tox-load
             tox-bootstrap-from-address
@@ -116,12 +116,6 @@ transcoding the hexadecimal string ADDRESS."
       (hex-string->bytevector address)
       (error "Invalid Tox friend address: " address)))
 
-(define-wrapped-pointer-type <tox>
-  tox? %wrap-tox unwrap-tox
-  (lambda (tox port)
-    (format port "#<<tox> ~x>"
-            (pointer-address (unwrap-tox tox)))))
-
 ;;;
 ;;; Hooks
 ;;;
@@ -146,7 +140,7 @@ transcoding the hexadecimal string ADDRESS."
                                               ('* message) (uint16 length)
                                               ('* user-data))
   (run-hook tox-friend-request-hook
-            (%wrap-tox tox)
+            (wrap-tox tox)
             (pointer->bytevector public-key tox-client-id-size)
             (utf8-pointer->string message length)))
 
@@ -156,7 +150,7 @@ transcoding the hexadecimal string ADDRESS."
                                               ('* message) (uint16 length)
                                               ('* user-data))
   (run-hook tox-message-hook
-            (%wrap-tox tox)
+            (wrap-tox tox)
             friend-number
             (utf8-pointer->string message length)))
 
@@ -166,7 +160,7 @@ transcoding the hexadecimal string ADDRESS."
                                              ('* action) (uint16 length)
                                              ('* user-data))
   (run-hook tox-action-hook
-            (%wrap-tox tox)
+            (wrap-tox tox)
             friend-number
             (utf8-pointer->string action length)))
 
@@ -176,7 +170,7 @@ transcoding the hexadecimal string ADDRESS."
                                            ('* name) (uint16 length)
                                            ('* user-data))
   (run-hook tox-name-change-hook
-            (%wrap-tox tox)
+            (wrap-tox tox)
             friend-number
             (utf8-pointer->string name length)))
 
@@ -186,7 +180,7 @@ transcoding the hexadecimal string ADDRESS."
                                               ('* message) (uint16 length)
                                               ('* user-data))
   (run-hook tox-status-message-hook
-            (%wrap-tox tox)
+            (wrap-tox tox)
             friend-number
             (utf8-pointer->string message length)))
 
@@ -195,7 +189,7 @@ transcoding the hexadecimal string ADDRESS."
 (define-tox-callback (user-status-callback ('* tox) (int32 friend-number)
                                            (uint8 status) ('* user-data))
   (run-hook tox-status-hook
-            (%wrap-tox tox)
+            (wrap-tox tox)
             friend-number
             status))
 
@@ -204,7 +198,7 @@ transcoding the hexadecimal string ADDRESS."
 (define-tox-callback (typing-change-callback ('* tox) (int32 friend-number)
                                              (uint8 typing) ('* user-data))
   (run-hook tox-typing-hook
-            (%wrap-tox tox)
+            (wrap-tox tox)
             friend-number
             (one? typing)))
 
@@ -213,7 +207,7 @@ transcoding the hexadecimal string ADDRESS."
 (define-tox-callback (read-receipt-callback ('* tox) (int32 friend-number)
                                             (int32 receipt) ('* user-data))
   (run-hook tox-read-receipt-hook
-            (%wrap-tox tox)
+            (wrap-tox tox)
             friend-number
             receipt))
 
@@ -222,7 +216,7 @@ transcoding the hexadecimal string ADDRESS."
 (define-tox-callback (connection-status-callback ('* tox) (int32 friend-number)
                                                  (uint8 status) ('* user-data))
  (run-hook tox-online-hook
-           (%wrap-tox tox)
+           (wrap-tox tox)
            friend-number
            (one? status)))
 
@@ -232,7 +226,7 @@ transcoding the hexadecimal string ADDRESS."
                                             ('* group-public-key)
                                             ('* user-data))
   (run-hook tox-group-invite-hook
-            (%wrap-tox tox)
+            (wrap-tox tox)
             friend-number
             (pointer->bytevector group-public-key tox-friend-address-size)))
 
@@ -243,7 +237,7 @@ transcoding the hexadecimal string ADDRESS."
                                              ('* message) (uint16 length)
                                              ('* user-data))
   (run-hook tox-group-message-hook
-            (%wrap-tox tox)
+            (wrap-tox tox)
             group-number
             peer-number
             (utf8-pointer->string message length)))
@@ -255,7 +249,7 @@ transcoding the hexadecimal string ADDRESS."
                                             ('* action) (uint16 length)
                                             ('* user-data))
   (run-hook tox-group-action-hook
-            (%wrap-tox tox)
+            (wrap-tox tox)
             group-number
             peer-number
             (utf8-pointer->string action length)))
@@ -266,7 +260,7 @@ transcoding the hexadecimal string ADDRESS."
                                           (int peer-number)
                                           (int event) ('* user-data))
   (run-hook tox-group-peer-hook
-            (%wrap-tox tox)
+            (wrap-tox tox)
             group-number
             peer-number
             event))
@@ -280,7 +274,7 @@ transcoding the hexadecimal string ADDRESS."
                                                  (uint16 file-name-length)
                                                  ('* user-data))
   (run-hook tox-file-send-request-hook
-            (%wrap-tox tox)
+            (wrap-tox tox)
             friend-number
             file-number
             file-size
@@ -294,7 +288,7 @@ transcoding the hexadecimal string ADDRESS."
                                             ('* data) (uint16 length)
                                             ('* user-data))
   (run-hook tox-file-control-hook
-            (%wrap-tox tox)
+            (wrap-tox tox)
             friend-number
             file-number
             (if (zero? mode) 'receive 'send)
@@ -308,12 +302,12 @@ transcoding the hexadecimal string ADDRESS."
                                          ('* data) (uint16 length)
                                          ('* user-data))
   (run-hook tox-file-data-hook
-            (%wrap-tox tox)
+            (wrap-tox tox)
             friend-number
             file-number
             (bytevector->pointer data length)))
 
-(define (wrap-tox pointer)
+(define (wrap-tox* pointer)
   (define-syntax-rule (register-callbacks ((set-callback callback) ...))
     (begin
       (set-callback pointer callback %null-pointer)
@@ -336,23 +330,18 @@ transcoding the hexadecimal string ADDRESS."
     (%tox-callback-file-send-request file-send-request-callback)
     (%tox-callback-file-control file-control-callback)
     (%tox-callback-file-data file-data-callback)))
-  (%wrap-tox pointer))
+  (wrap-tox pointer))
 
 ;;;
 ;;; Core API
 ;;;
-
-(define-syntax-rule (define/unwrap name docstring proc)
-  (define (name tox)
-    docstring
-    (proc (unwrap-tox tox))))
 
 (define (make-tox)
   "Return a newly allocated Tox messenger object."
   (let ((ptr (%tox-new %null-pointer)))
     (if (null-pointer? ptr)
         (error "Failed to create Tox messenger")
-        (wrap-tox ptr))))
+        (wrap-tox* ptr))))
 
 (define/unwrap tox-kill
   "Free all memory associated with the messenger TOX."

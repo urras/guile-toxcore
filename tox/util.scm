@@ -25,7 +25,8 @@
   #:use-module (ice-9 format)
   #:use-module (rnrs bytevectors)
   #:use-module (system foreign)
-  #:export (boolean->number
+  #:export (tox? wrap-tox unwrap-tox define/unwrap
+            boolean->number
             one?
             define-enumeration
             hex-string->bytevector bytevector->hex-string
@@ -34,6 +35,17 @@
             false-if-negative false-if-zero
             htons)
   #:replace (htons))
+
+(define-wrapped-pointer-type <tox>
+  tox? wrap-tox unwrap-tox
+  (lambda (tox port)
+    (format port "#<<tox> ~x>"
+            (pointer-address (unwrap-tox tox)))))
+
+(define-syntax-rule (define/unwrap name docstring proc)
+  (define (name tox)
+    docstring
+    (proc (unwrap-tox tox))))
 
 (define (boolean->number true?)
   "Return 1 if TRUE? is #t, 0 otherwise."
