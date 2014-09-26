@@ -524,16 +524,17 @@ Return the message id on success, #f otherwise."
         (utf8->string (bytevector-slice name 0 length))
         (error "Failed to get nickname"))))
 
-(define (tox-friend-name tox friend-number)
+(define* (tox-friend-name tox friend-number
+                          #:optional #:key (anonymous "Anonymous"))
   "Return the nickname of the friend identified by FRIEND-NUMBER for the
-messenger TOX."
+messenger TOX, or ANONYMOUS if they have no nickname."
   (let* ((name (make-bytevector tox-max-name-length))
          (length (%tox-get-name (unwrap-tox tox)
                                 friend-number
                                 (bytevector->pointer name))))
     (if (positive? length)
         (utf8->string (bytevector-slice name 0 length))
-        (error "Failed to get nickname for friend number: " friend-number))))
+        anonymous)))
 
 (define (set-tox-status tox status)
   "Set the user status for the messenger TOX to STATUS."
