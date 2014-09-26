@@ -350,7 +350,9 @@ transcoding the hexadecimal string ADDRESS."
          (options (make-c-struct (list uint8 uint8 uint8
                                        (make-list 256 uint8) uint16)
                                  (list (boolean->number ipv6?)
-                                       (boolean->number udp?)
+                                       ;; This is udp_disabled, so the
+                                       ;; negation is necessary.
+                                       (boolean->number (not udp?))
                                        (boolean->number proxy?)
                                        proxy-address
                                        proxy-port)))
